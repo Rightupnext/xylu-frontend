@@ -20,3 +20,8 @@ body{
 .ant-rate-star-half .anticon {
   color: black !important;
 }
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #a44c6c;
+  border-color: #c97a9f;
+}
+

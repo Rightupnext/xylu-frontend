@@ -62,7 +62,15 @@ export default function Hero() {
       return () => clearTimeout(timer);
     }
   }, [location.pathname]);
+useEffect(() => {
+    if (isModalOpen) {
+      const closeTimer = setTimeout(() => {
+        setIsModalOpen(false);
+      }, 20000); 
 
+      return () => clearTimeout(closeTimer);
+    }
+  }, [isModalOpen]);
   return (
     <>
       <Carousel autoplay dots>

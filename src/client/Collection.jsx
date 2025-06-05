@@ -62,7 +62,7 @@ const ProductCard = ({ product }) => (
     className="bg-white rounded-xl  overflow-hidden shadow hover:shadow-lg transition-all"
     whileHover={{ scale: 1.02 }}
   >
-    <Link to={`${product.link}`} className="cursor-pointer">
+    <Link to={`${product.id}`} className="cursor-pointer">
       <div className="relative ">
         <img
           src={product.image}

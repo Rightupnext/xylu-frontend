@@ -17,6 +17,10 @@ import NewArrivals from "./NewArrivals";
 import { FaTruckArrowRight } from "react-icons/fa6";
 import { GiReturnArrow } from "react-icons/gi";
 import { ImGift } from "react-icons/im";
+import { products } from "../products";
+import { useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCartThunk } from "../store/slice/CartSlice";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const colors = [
@@ -28,6 +32,10 @@ const colors = [
 const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const ProductDetail = () => {
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const product = products.find((p) => p.id === Number(id));
+
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState(colors[0].name);
 
@@ -71,6 +79,26 @@ const ProductDetail = () => {
   const [showForm, setShowForm] = useState(false);
 
   const toggleForm = () => setShowForm((prev) => !prev);
+  if (!product)
+    return <div className="text-center p-10">Product not found</div>;
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      alert("Please select a size.");
+      return;
+    }
+    if (!selectedColor) {
+      alert("Please select a color.");
+      return;
+    }
+
+    dispatch(
+      addToCartThunk({
+        product,
+        selectedColor,
+        selectedSize,
+      })
+    );
+  };
 
   return (
     <>
@@ -84,7 +112,7 @@ const ProductDetail = () => {
               transition={{ duration: 0.5 }}
             >
               <img
-                src="https://img.freepik.com/premium-photo/womens-summer-png-fashion-sticker-transparent-background_53876-979603.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740"
+                src={product.image}
                 alt="Maxi Dress"
                 className="w-full rounded shadow"
               />
@@ -98,39 +126,60 @@ const ProductDetail = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <Tag color="#000000 ">{product.tag}</Tag>
               {/* Title + Price */}
-              <Title level={4}>Maxi Long Pattern Navy Blue</Title>
+              <Title level={4}>{product.title}</Title>
+
               <Rate disabled defaultValue={5} />
               <Text type="secondary" className="ml-2">
                 50 Reviews
               </Text>
 
               <div className="mt-3 mb-4">
-                <Text delete>$238</Text>{" "}
+                <Text delete>₹ {product.originalPrice}</Text>{" "}
                 <Text strong style={{ color: "#B03A66", fontSize: 20 }}>
-                  $167
+                  ₹{product.price}
                 </Text>
               </div>
 
               {/* Color Selection */}
               <Text strong>Color: </Text>
               <div className="my-2">
-                <Radio.Group value={selectedColor} onChange={handleColorChange}>
+                <div style={{ display: "flex", alignItems: "center" }}>
                   {colors.map((color) => (
-                    <Radio.Button
+                    <Button
                       key={color.name}
-                      value={color.name}
+                      onClick={() => setSelectedColor(color.name)}
                       style={{
+                        position: "relative",
                         backgroundColor: color.hex,
                         borderRadius: "50%",
-                        width: 30,
-                        height: 30,
+                        width: 50,
+                        height: 50,
                         marginRight: 10,
-                        border: "2px solid #ccc",
+                        border:
+                          selectedColor === color.name
+                            ? "4px solid pink"
+                            : "2px solid #ccc",
+                        padding: 0,
                       }}
-                    />
+                    >
+                      {/* Tick mark positioned absolute on top center */}
+                      {selectedColor === color.name && (
+                        <span
+                          style={{
+                            color: "pink",
+                            fontWeight: "bold",
+                            fontSize: 24,
+                            lineHeight: "50px",
+                          }}
+                        >
+                          ✓
+                        </span>
+                      )}
+                    </Button>
                   ))}
-                </Radio.Group>
+                </div>
               </div>
 
               {/* Size Selection */}
@@ -153,13 +202,26 @@ const ProductDetail = () => {
                   ))}
                 </div>
               </div>
+              {/* Description */}
+              <Divider />
+              <Title level={5}>Part shirt, part jacket, all style.</Title>
+              <Paragraph>
+                Meet your new chilly weather staple. The Melrose Oversized
+                Shacket has all the elements of a classic shirt — collar, snap
+                buttons, and a shirttail hem — along with front chest flap
+                pockets and an on-seam pocket. The fabric is soft, structured
+                woven with TENCEL™ and certified recycled nylon blend. Thick
+                cord, comfy, and oh-so easy to layer.
+              </Paragraph>
 
+              <Divider />
               {/* Add to Cart Button */}
               <div className="mt-4 mb-2">
                 <Button
                   type="primary"
                   block
                   size="large"
+                  onClick={handleAddToCart}
                   style={{ backgroundColor: "#4a1f2e", border: "none" }}
                 >
                   ADD TO BAG
@@ -176,7 +238,7 @@ const ProductDetail = () => {
                 </Tag>
 
                 <Paragraph className="mt-1 mb-0" type="secondary">
-                  On all U.S. orders over $100. <a href="#">Learn more</a>
+                  On all U.S. orders over ₹100. <a href="#">Learn more</a>
                 </Paragraph>
 
                 <Divider className="my-4" />
@@ -198,20 +260,6 @@ const ProductDetail = () => {
                   Add a free personalized note during checkout.
                 </Paragraph>
               </div>
-
-              {/* Description */}
-              <Divider />
-              <Title level={5}>Part shirt, part jacket, all style.</Title>
-              <Paragraph>
-                Meet your new chilly weather staple. The Melrose Oversized
-                Shacket has all the elements of a classic shirt — collar, snap
-                buttons, and a shirttail hem — along with front chest flap
-                pockets and an on-seam pocket. The fabric is soft, structured
-                woven with TENCEL™ and certified recycled nylon blend. Thick
-                cord, comfy, and oh-so easy to layer.
-              </Paragraph>
-
-              <Divider />
 
               {/* Sustainability */}
               <Title level={5}>Sustainability</Title>

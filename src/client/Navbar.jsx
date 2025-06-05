@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MenuOutlined,
   ShoppingOutlined,
@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import { GiAmpleDress } from "react-icons/gi";
+import { Avatar, Badge } from "antd";
+import { useSelector } from "react-redux";
 const collectionItems = [
   "Occasion Wear",
   "Fusion Wear",
@@ -30,6 +32,9 @@ const collectionItems = [
 export default function Navbar() {
   const [isHovering, setIsHovering] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const distinctCount = cartItems.length;
 
   return (
     <nav className="w-full shadow-md bg-white fixed top-0 z-50">
@@ -101,11 +106,15 @@ export default function Navbar() {
         </div>
 
         {/* Right Icons */}
-        <div className="flex space-x-4 text-black items-center text-lg">
+        <div className="flex space-x-[20px] text-black items-center text-lg">
           <SearchOutlined />
-          <ShoppingOutlined />
+          <Link to="/cart">
+            <Badge count={distinctCount} showZero={true}>
+              <ShoppingOutlined className="text-3xl" />
+            </Badge>
+          </Link>
           <TiThMenu
-            className="sm:hidden cursor-pointer"
+            className="sm:hidden cursor-pointer ml-[20px] text-3xl"
             onClick={() => setIsMobileMenuOpen(true)}
           />
         </div>

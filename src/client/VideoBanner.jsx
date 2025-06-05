@@ -1,3 +1,4 @@
+import bannervideo from "../assets/banner.mp4";
 export default function VideoBanner() {
   return (
     <div className="relative w-full h-[400px] overflow-hidden">
@@ -11,7 +12,7 @@ export default function VideoBanner() {
       >
         <source
           // src="https://videos.pexels.com/video-files/8387487/8387487-uhd_2732_1440_25fps.mp4"
-          src="https://videos.pexels.com/video-files/8386980/8386980-sd_960_506_25fps.mp4"
+          src={bannervideo}
           type="video/mp4"
         />
         Your browser does not support the video tag.

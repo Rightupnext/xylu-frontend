@@ -1,12 +1,79 @@
-# React + Vite
+# XYLU E-Commerce Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## Table of Contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [Project Overview](#project-overview)  
+- [Key Features](#key-features)  
+- [Tech Stack](#tech-stack)  
+- [Architecture](#architecture)  
+- [Setup & Installation](#setup--installation)  
+- [Usage](#usage)  
+- [Environment Variables](#environment-variables)  
+- [Testing](#testing)  
+- [Deployment](#deployment)  
+- [Contributing](#contributing)  
+- [License](#license)  
+- [Contact](#contact)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Project Overview
+
+XYLU E-Commerce Frontend is a responsive and user-friendly React application for a fashion dress e-commerce platform. It allows users to browse, filter, and purchase dresses with multiple color and size options. The frontend communicates with a backend API to manage products, cart, and user sessions.
+
+---
+
+## Key Features
+
+- Responsive product listing with filtering by category, color, and size  
+- Product detail pages with image gallery and selection options  
+- Shopping cart management with quantity adjustments  
+- User authentication (via backend) and protected routes  
+- Modern UI built with Tailwind CSS and Ant Design components  
+- State management with Redux Toolkit for global cart and user states  
+
+---
+
+## Tech Stack
+
+| Layer           | Technologies                  |
+| --------------- | ---------------------------- |
+| Frontend        | ReactJS, Tailwind CSS, Ant Design, Redux Toolkit |
+| Backend         | (Separate backend API)        |
+| API Communication | REST API (Axios or Fetch)    |
+| Authentication  | Handled by backend (JWT/Clerk) |
+| Deployment      | Vercel/Netlify or custom domain (www.example.com) |
+
+---
+
+## Architecture
+
+The frontend is a Single Page Application (SPA) built with ReactJS. It fetches product and user data from the backend REST API. State management is done via Redux Toolkit to manage cart and user session globally. Tailwind CSS is used for styling and Ant Design provides reusable UI components.
+
+---
+
+## Setup & Installation
+
+### Prerequisites
+
+- Node.js v16 or higher  
+- npm (Node Package Manager)  
+- Access to backend API (live or local)  
+
+### Steps
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/xylu-ecommerce-frontend.git
+cd xylu-ecommerce-frontend
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Start the development server
+npm run dev

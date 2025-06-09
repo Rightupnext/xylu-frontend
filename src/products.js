@@ -11,7 +11,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 2,
@@ -165,7 +165,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 13,
@@ -221,7 +221,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 17,
@@ -235,7 +235,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 18,
@@ -249,7 +249,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 19,
@@ -277,7 +277,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 21,
@@ -347,7 +347,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 26,
@@ -375,7 +375,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 28,
@@ -613,7 +613,7 @@ export const products = [
     description:
       "Meet your new chilly weather staple. The Melrose Oversized Shacket has all the elements of a classic shirt — collar, snap buttons, and a shirttail hem — along with front chest flap pockets and an on-seam pocket. The fabric is soft, structured woven with TENCEL™ and certified recycled nylon blend. Thick cord, comfy, and oh-so easy to layer.",
     image:
-      "https://img.freepik.com/premium-photo/png-long-casual-maxi-dress_53876-834127.jpg",
+      "https://img.freepik.com/premium-photo/girl-dress-png-sticker-transparent-background_53876-989899.jpg?uid=R155413258&ga=GA1.1.471318040.1721215360&semt=ais_items_boosted&w=740",
   },
   {
     id: 45,

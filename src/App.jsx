@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./client/Navbar";
 import Home from "./client/Home";
 import Footer from "./client/Footer";
@@ -9,25 +9,31 @@ import ProductDetail from "./client/ProductDetailsPage";
 import FaqSection from "./client/FaqSection";
 import Login from "./client/Login";
 import AddToCart from "./client/AddToCart";
-// import other pages as needed
+import CursorFollower from "./client/CursorFollower";
+import Layout from "./dashboard/Layout";
+import HomeDashboard from "./dashboard/HomeDashboard";
 
 function App() {
+  const location = useLocation();
+  const shouldHideLayout = location.pathname.startsWith("/admin");
   return (
-    <Router>
-      <Navbar />
+    <>
+      {/* <CursorFollower/> */}
+      {!shouldHideLayout && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path=":collections" element={<Collection />} />
-        <Route path="/contact" element={<ContactPage/>} />
-        <Route path=":collection/:id" element={<ProductDetail/>} />
-        <Route path="/faq" element={<FaqSection/>} />
-        <Route path="/login" element={<Login/>} />
-        <Route path="/cart" element={<AddToCart/>} />
-
-        {/* add more routes as needed */}
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path=":collection/:id" element={<ProductDetail />} />
+        <Route path="/faq" element={<FaqSection />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/cart" element={<AddToCart />} />
+        <Route path="/admin" element={<Layout />}>
+          <Route path="" element={<HomeDashboard />} />
+        </Route>
       </Routes>
-      <Footer />
-    </Router>
+      {!shouldHideLayout && <Footer />}
+    </>
   );
 }
 

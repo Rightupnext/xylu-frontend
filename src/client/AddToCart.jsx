@@ -72,7 +72,7 @@ export default function AddToCartAntd() {
                       <Text strong>{item.title}</Text>
                       <br />
                       <div className="flex gap-3">
-                        <h1 className="text-black"> Size:</h1>
+                        <h1 className="text-black"> Size :</h1>
                         <Button className="w-8 !h-8 !p-0 !rounded-md font-semibold text-sm !bg-black !text-white !border-black">
                           {item.selectedSize}
                         </Button>
@@ -177,6 +177,7 @@ export default function AddToCartAntd() {
                 block
                 size="large"
                 className="mt-4 bg-black hover:bg-gray-800"
+                style={{ backgroundColor: "black" }}
               >
                 Checkout
               </Button>

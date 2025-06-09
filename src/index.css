@@ -25,3 +25,16 @@ body{
   border-color: #c97a9f;
 }
 
+/* DashboardLayout.css */
+
+
+
+.custom-sidebar-menu .ant-menu-item-selected {
+  background-color: #c97a9f !important;
+  color: white !important;
+}
+
+.custom-sidebar-menu .ant-menu-item:hover {
+  background-color: #c97a9f !important;
+  color: white !important;
+}

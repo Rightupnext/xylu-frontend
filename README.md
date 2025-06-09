@@ -4,17 +4,17 @@
 
 ## Table of Contents
 
-- [Project Overview](#project-overview)  
-- [Key Features](#key-features)  
-- [Tech Stack](#tech-stack)  
-- [Architecture](#architecture)  
-- [Setup & Installation](#setup--installation)  
-- [Usage](#usage)  
-- [Environment Variables](#environment-variables)  
-- [Testing](#testing)  
-- [Deployment](#deployment)  
-- [Contributing](#contributing)  
-- [License](#license)  
+- [Project Overview](#project-overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Setup & Installation](#setup--installation)
+- [Usage](#usage)
+- [Environment Variables](#environment-variables)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 - [Contact](#contact)
 
 ---
@@ -27,24 +27,24 @@ XYLU E-Commerce Frontend is a responsive and user-friendly React application for
 
 ## Key Features
 
-- Responsive product listing with filtering by category, color, and size  
-- Product detail pages with image gallery and selection options  
-- Shopping cart management with quantity adjustments  
-- User authentication (via backend) and protected routes  
-- Modern UI built with Tailwind CSS and Ant Design components  
-- State management with Redux Toolkit for global cart and user states  
+- Responsive product listing with filtering by category, color, and size
+- Product detail pages with image gallery and selection options
+- Shopping cart management with quantity adjustments
+- User authentication (via backend) and protected routes
+- Modern UI built with Tailwind CSS and Ant Design components
+- State management with Redux Toolkit for global cart and user states
 
 ---
 
 ## Tech Stack
 
-| Layer           | Technologies                  |
-| --------------- | ---------------------------- |
-| Frontend        | ReactJS, Tailwind CSS, Ant Design, Redux Toolkit |
-| Backend         | (Separate backend API)        |
-| API Communication | REST API (Axios or Fetch)    |
-| Authentication  | Handled by backend (JWT/Clerk) |
-| Deployment      | Vercel/Netlify or custom domain (www.example.com) |
+| Layer             | Technologies                                      |
+| ----------------- | ------------------------------------------------- |
+| Frontend          | ReactJS, Tailwind CSS, Ant Design, Redux Toolkit  |
+| Backend           | (Separate backend API)                            |
+| API Communication | REST API (Axios or Fetch)                         |
+| Authentication    | Handled by backend (JWT/Clerk)                    |
+| Deployment        | Vercel/Netlify or custom domain (www.example.com) |
 
 ---
 
@@ -58,9 +58,9 @@ The frontend is a Single Page Application (SPA) built with ReactJS. It fetches p
 
 ### Prerequisites
 
-- Node.js v16 or higher  
-- npm (Node Package Manager)  
-- Access to backend API (live or local)  
+- Node.js v16 or higher
+- npm (Node Package Manager)
+- Access to backend API (live or local)
 
 ### Steps
 
@@ -77,3 +77,4 @@ cp .env.example .env
 
 # Start the development server
 npm run dev
+```

@@ -1,27 +1,41 @@
 import React, { useState } from "react";
 import { Form, Input, Button } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDispatch } from "react-redux";
+import { loginUser, registerUser } from "../store/slice/authSlice";
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState("signup");
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
 
   const motionVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
 
+  const onFinish = (values) => {
+    if (activeTab === "signup") {
+      dispatch(registerUser(values));
+    } else {
+      dispatch(loginUser(values));
+    }
+    form.resetFields();
+  };
+
   return (
     <div className="flex min-h-screen w-full">
-      {/* Left Side */}
       <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-6">
-        {/* Tabs */}
         <div className="w-full max-w-md mb-6">
           <div className="flex gap-1 text-sm font-semibold tracking-wide mb-2">
             {["signup", "signin"].map((tab) => (
               <button
                 key={tab}
                 type="button"
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  setActiveTab(tab);
+                  form.resetFields();
+                }}
                 style={{
                   cursor: "pointer",
                   padding: "4px 12px",
@@ -44,7 +58,6 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Form Animation */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -55,12 +68,19 @@ const Login = () => {
             transition={{ duration: 0.3 }}
             className="w-full max-w-md"
           >
-            <Form layout="vertical">
+            <Form
+              layout="vertical"
+              form={form}
+              onFinish={onFinish}
+              autoComplete="off"
+            >
               {activeTab === "signup" && (
                 <Form.Item
                   label="Name"
                   name="name"
-                  rules={[{ required: true, message: "Please enter your name" }]}
+                  rules={[
+                    { required: true, message: "Please enter your name" },
+                  ]}
                 >
                   <Input placeholder="Name" />
                 </Form.Item>
@@ -69,7 +89,13 @@ const Login = () => {
               <Form.Item
                 label="Email address"
                 name="email"
-                rules={[{ required: true, type: "email", message: "Valid email required" }]}
+                rules={[
+                  {
+                    required: true,
+                    type: "email",
+                    message: "Valid email required",
+                  },
+                ]}
               >
                 <Input placeholder="xyz@xyz.com" />
               </Form.Item>
@@ -77,7 +103,10 @@ const Login = () => {
               <Form.Item
                 label="Password"
                 name="password"
-                rules={[{ required: true, message: "Please enter your password" }]}
+                rules={[
+                  { required: true, message: "Please enter your password" },
+                  { min: 6, message: "Minimum 6 characters" },
+                ]}
               >
                 <Input.Password placeholder="Password" />
               </Form.Item>
@@ -88,13 +117,18 @@ const Login = () => {
                   name="confirmPassword"
                   dependencies={["password"]}
                   rules={[
-                    { required: true, message: "Please confirm your password" },
+                    {
+                      required: true,
+                      message: "Please confirm your password",
+                    },
                     ({ getFieldValue }) => ({
                       validator(_, value) {
                         if (!value || getFieldValue("password") === value) {
                           return Promise.resolve();
                         }
-                        return Promise.reject(new Error("Passwords do not match!"));
+                        return Promise.reject(
+                          new Error("Passwords do not match!")
+                        );
                       },
                     }),
                   ]}
@@ -120,11 +154,10 @@ const Login = () => {
               </Form.Item>
             </Form>
 
-            {/* Switch Tab Prompt */}
             <div className="text-center text-sm mt-4 text-[#a44c6c]">
               {activeTab === "signin" ? (
                 <>
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <span
                     className="text-blue-600 cursor-pointer"
                     onClick={() => setActiveTab("signup")}
@@ -148,7 +181,6 @@ const Login = () => {
         </AnimatePresence>
       </div>
 
-      {/* Right side (for design) */}
       <div className="hidden lg:flex w-1/2 bg-[#9C4464] relative"></div>
     </div>
   );

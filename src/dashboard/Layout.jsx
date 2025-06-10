@@ -6,12 +6,11 @@ import {
   UserOutlined,
   VideoCameraOutlined,
   LogoutOutlined,
-  SettingOutlined,
 } from "@ant-design/icons";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { Button, Dropdown, Layout, Menu, theme, Space, Avatar } from "antd";
 import { Outlet } from "react-router-dom";
-const { Header, Sider, Content } = Layout;
+const { Header, Sider } = Layout;
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const {

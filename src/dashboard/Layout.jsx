@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { Button, Dropdown, Layout, Menu, theme, Space, Avatar } from "antd";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 const { Header, Sider } = Layout;
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,6 +42,7 @@ const DashboardLayout = () => {
           mode="inline"
           className="custom-sidebar-menu"
           defaultSelectedKeys={["1"]}
+          
           items={[
             {
               key: "1",
@@ -51,12 +52,12 @@ const DashboardLayout = () => {
             {
               key: "2",
               icon: <VideoCameraOutlined />,
-              label: "New Orders",
+             label: <Link to="category">Category</Link>,
             },
             {
               key: "3",
               icon: <UploadOutlined />,
-              label: "nav 3",
+              label: "Inventory",
             },
           ]}
         />

@@ -14,13 +14,15 @@ import HomeDashboard from "./dashboard/HomeDashboard";
 
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
-
+import ScrollToTop from './ScrollToTop'
+import CategoryManager from "./dashboard/CategoryManager";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
 
   return (
     <>
+    <ScrollToTop/>
       {!isAdminPath && <Navbar />}
 
       <Routes>
@@ -65,6 +67,7 @@ function App() {
           }
         >
           <Route index element={<HomeDashboard />} />
+          <Route path="category" element={<CategoryManager />} />
         </Route>
 
         {/* 🔓 LOGIN (only when logged out) */}

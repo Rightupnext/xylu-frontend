@@ -13,7 +13,8 @@ import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import { GiAmpleDress } from "react-icons/gi";
 import { Avatar, Badge } from "antd";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../store/slice/categorySlice";
 const collectionItems = [
   "Occasion Wear",
   "Fusion Wear",
@@ -30,12 +31,16 @@ const collectionItems = [
 ];
 
 export default function Navbar() {
+  const dispatch = useDispatch();
+  const { categories, loading } = useSelector((state) => state.category);
   const [isHovering, setIsHovering] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const distinctCount = cartItems.length;
-
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
   return (
     <nav className="w-full shadow-md bg-white fixed top-0 z-50">
       {/* Top bar */}
@@ -82,15 +87,17 @@ export default function Navbar() {
                   className="absolute left-1/2 top-full transform -translate-x-1/2 w-[900px] bg-gray-50 shadow-lg p-4 mt-[34px] z-50"
                 >
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {collectionItems.map((item, index) => (
+                    {categories?.data?.map((item, index) => (
                       <Link
                         key={index}
-                        to={`/${item.toLowerCase().replace(/\s/g, "-")}`}
+                        to={`/${item.category_name
+                          .toLowerCase()
+                          .replace(/\s/g, "-")}`}
                       >
                         <div className="hover:bg-gray-100 p-2 rounded cursor-pointer">
                           <span className="flex px-4">
                             <GiAmpleDress className="text-xl text-[#a5496c]" />
-                            {item}
+                            {item.category_name}
                           </span>
                         </div>
                       </Link>

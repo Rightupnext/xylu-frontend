@@ -21,7 +21,7 @@ export const addToCartThunk = createAsyncThunk(
     notification.open({
       type: "success",
       message: "Added to cart",
-      description: `${product.title} has been added to your cart.`,
+      description: `${product.product_name} has been added to your cart.`,
     });
   }
 );
@@ -34,7 +34,7 @@ export const removeFromCartThunk = createAsyncThunk(
       dispatch(removeFromCart(index));
       notification.warning({
         message: "Item Removed",
-        description: `${removedItem.title} has been removed from your cart.`,
+        description: `${removedItem.product_name} has been removed from your cart.`,
       });
     }
   }
@@ -61,7 +61,7 @@ const cartSlice = createSlice({
         // Add new item
         state.items.push({
           id: product.id,
-          title: product.title,
+          product_name: product.product_name,
           price: product.price,
           originalPrice: product.originalPrice,
           image: product.image,

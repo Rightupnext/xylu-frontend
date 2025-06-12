@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
   Typography,
   Rate,
-  Radio,
   Button,
   Divider,
   Tag,
@@ -17,35 +16,55 @@ import NewArrivals from "./NewArrivals";
 import { FaTruckArrowRight } from "react-icons/fa6";
 import { GiReturnArrow } from "react-icons/gi";
 import { ImGift } from "react-icons/im";
-import { products } from "../products";
 import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCartThunk } from "../store/slice/CartSlice";
+import { getProductById } from "../store/slice/productSlice";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
-const colors = [
-  { name: "Black", hex: "#000000" },
-  { name: "Brown", hex: "#5a3e36" },
-  { name: "Navy", hex: "#1c1c7e" },
-];
-
-const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
+  const { selectedProduct } = useSelector((state) => state.product);
   const { id } = useParams();
-  const product = products.find((p) => p.id === Number(id));
+
+  useEffect(() => {
+    dispatch(getProductById(id));
+  }, [dispatch, id]);
 
   const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState(colors[0].name);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
-  const handleSizeChange = (size) => {
-    setSelectedSize(size);
+  const toggleForm = () => setShowForm((prev) => !prev);
+
+  const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor) {
+      alert("Please select both size and color.");
+      return;
+    }
+
+    dispatch(
+      addToCartThunk({
+        product: selectedProduct,
+        selectedColor,
+        selectedSize,
+      })
+    );
   };
 
-  const handleColorChange = (e) => {
-    setSelectedColor(e.target.value);
+  const getAvailableColors = () => {
+    const colorSet = new Set();
+    selectedProduct?.variants.forEach((v) => colorSet.add(v.color));
+    return Array.from(colorSet);
   };
+
+  const getAvailableSizes = () => {
+    return selectedProduct?.variants
+      .filter((v) => v.color === selectedColor)
+      .flatMap((v) => v.size);
+  };
+
   const reviews = [
     {
       name: "ElizabethR Bklyn",
@@ -53,7 +72,7 @@ const ProductDetail = () => {
       rating: 5,
       date: "14 days ago",
       title: "Warm and very attractive on",
-      body: "Got this to keep my husband warm on those chilly late fall days. He loves it as it not only is pretty warm but he looks good in it and he knows it.",
+      body: "Got this to keep my husband warm on those chilly late fall days...",
       profile: {
         height: "5’10”",
         weight: "170 – 180 lbs",
@@ -67,7 +86,7 @@ const ProductDetail = () => {
       rating: 5,
       date: "14 days ago",
       title: "Super comfy",
-      body: "Great quality, warm and super comfy. Got the XL cuz I have a large back and it fits perfect. It does run a bit oversized which is good.",
+      body: "Great quality, warm and super comfy...",
       profile: {
         height: "6’1”",
         weight: "180 – 190 lbs",
@@ -76,35 +95,14 @@ const ProductDetail = () => {
       },
     },
   ];
-  const [showForm, setShowForm] = useState(false);
 
-  const toggleForm = () => setShowForm((prev) => !prev);
-  if (!product)
+  if (!selectedProduct)
     return <div className="text-center p-10">Product not found</div>;
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert("Please select a size.");
-      return;
-    }
-    if (!selectedColor) {
-      alert("Please select a color.");
-      return;
-    }
-
-    dispatch(
-      addToCartThunk({
-        product,
-        selectedColor,
-        selectedSize,
-      })
-    );
-  };
 
   return (
     <>
       <div className="max-w-screen-xl mx-auto p-6 mt-[170px]">
         <Row gutter={[32, 32]} align="top">
-          {/* LEFT - Product Image */}
           <Col xs={24} md={12}>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -112,60 +110,55 @@ const ProductDetail = () => {
               transition={{ duration: 0.5 }}
             >
               <img
-                src={product.image}
-                alt="Maxi Dress"
+                src={`http://localhost:5005/uploads/${selectedProduct?.image}`}
+                alt={selectedProduct?.product_name}
                 className="w-full rounded shadow"
               />
             </motion.div>
           </Col>
 
-          {/* RIGHT - Product Details */}
           <Col xs={24} md={12}>
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Tag color="#000000 ">{product.tag}</Tag>
-              {/* Title + Price */}
-              <Title level={4}>{product.title}</Title>
-
+              <Tag color="#000000">{selectedProduct?.trend}</Tag>
+              <Title level={4}>{selectedProduct?.product_name}</Title>
               <Rate disabled defaultValue={5} />
               <Text type="secondary" className="ml-2">
                 50 Reviews
               </Text>
-
               <div className="mt-3 mb-4">
-                <Text delete>₹ {product.originalPrice}</Text>{" "}
                 <Text strong style={{ color: "#B03A66", fontSize: 20 }}>
-                  ₹{product.price}
+                  ₹{selectedProduct?.price}
                 </Text>
               </div>
 
               {/* Color Selection */}
-              <Text strong>Color: </Text>
+              <Text strong>Color:</Text>
               <div className="my-2">
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  {colors.map((color) => (
+                  {getAvailableColors().map((color) => (
                     <Button
                       key={color.name}
-                      onClick={() => setSelectedColor(color.name)}
+                      onClick={() => setSelectedColor(color)}
                       style={{
                         position: "relative",
-                        backgroundColor: color.hex,
+                        backgroundColor: color,
                         borderRadius: "50%",
                         width: 50,
                         height: 50,
                         marginRight: 10,
                         border:
-                          selectedColor === color.name
+                          selectedColor === color
                             ? "4px solid pink"
                             : "2px solid #ccc",
                         padding: 0,
                       }}
                     >
                       {/* Tick mark positioned absolute on top center */}
-                      {selectedColor === color.name && (
+                      {selectedColor === color && (
                         <span
                           style={{
                             color: "pink",
@@ -181,54 +174,42 @@ const ProductDetail = () => {
                   ))}
                 </div>
               </div>
-
               {/* Size Selection */}
-              <div className="mt-4 mb-2">
-                <Text strong>Size:</Text>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {sizes.map((item) => (
-                    <Button
-                      key={item}
-                      onClick={() => handleSizeChange(item)}
-                      className={`!w-12 !h-12 !p-0 !rounded-md font-semibold text-sm ${
-                        selectedSize === item
-                          ? "!bg-black !text-white !border-black"
-                          : "!bg-white !text-black !border-gray-300"
-                      }`}
-                      type={selectedSize === item ? "default" : "text"}
-                    >
-                      {item}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              {/* Description */}
-              <Divider />
-              <Title level={5}>Part shirt, part jacket, all style.</Title>
-              <Paragraph>
-                Meet your new chilly weather staple. The Melrose Oversized
-                Shacket has all the elements of a classic shirt — collar, snap
-                buttons, and a shirttail hem — along with front chest flap
-                pockets and an on-seam pocket. The fabric is soft, structured
-                woven with TENCEL™ and certified recycled nylon blend. Thick
-                cord, comfy, and oh-so easy to layer.
-              </Paragraph>
+              {selectedColor && (
+                <>
+                  <Text strong>Size:</Text>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {getAvailableSizes().map((size) => (
+                      <Button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`!w-12 !h-12 !p-0 !rounded-md font-semibold text-sm ${
+                          selectedSize === size
+                            ? "!bg-black !text-white !border-black"
+                            : "!bg-white !text-black !border-gray-300"
+                        }`}
+                      >
+                        {size}
+                      </Button>
+                    ))}
+                  </div>
+                </>
+              )}
 
               <Divider />
-              {/* Add to Cart Button */}
-              <div className="mt-4 mb-2">
-                <Button
-                  type="primary"
-                  block
-                  size="large"
-                  onClick={handleAddToCart}
-                  style={{ backgroundColor: "#4a1f2e", border: "none" }}
-                >
-                  ADD TO BAG
-                </Button>
-              </div>
+              <Paragraph>{selectedProduct?.description}</Paragraph>
+              <Divider />
 
-              {/* Info Tags */}
+              <Button
+                type="primary"
+                block
+                size="large"
+                onClick={handleAddToCart}
+                style={{ backgroundColor: "#4a1f2e", border: "none" }}
+              >
+                ADD TO BAG
+              </Button>
+
               <div className="mt-4 mb-3">
                 <Tag
                   color="green"
@@ -236,32 +217,26 @@ const ProductDetail = () => {
                 >
                   Free Shipping
                 </Tag>
-
-                <Paragraph className="mt-1 mb-0" type="secondary">
+                <Paragraph type="secondary">
                   On all U.S. orders over ₹100. <a href="#">Learn more</a>
                 </Paragraph>
-
                 <Divider className="my-4" />
-
                 <Tag color="blue" icon={<GiReturnArrow className="text-xl" />}>
                   Easy Returns
                 </Tag>
-                <Paragraph className="mt-1 mb-0" type="secondary">
+                <Paragraph type="secondary">
                   Extended returns through January 31.{" "}
                   <a href="#">Returns details</a>
                 </Paragraph>
-
                 <Divider className="my-4" />
-
                 <Tag color="purple" icon={<ImGift className="text-2xl" />}>
                   Send As A Gift
                 </Tag>
-                <Paragraph className="mt-1" type="secondary">
+                <Paragraph type="secondary">
                   Add a free personalized note during checkout.
                 </Paragraph>
               </div>
 
-              {/* Sustainability */}
               <Title level={5}>Sustainability</Title>
               <div className="flex gap-2 flex-wrap">
                 <Tag icon={<span>♻️</span>} color="success">
@@ -275,10 +250,10 @@ const ProductDetail = () => {
           </Col>
         </Row>
       </div>
+
       <div className="max-w-7xl mx-auto p-6">
         <Title level={4}>5.0 Overall Rating</Title>
-        <Rate allowHalf disabled defaultValue={5} color="black" />
-
+        <Rate allowHalf disabled defaultValue={5} />
         <Row gutter={16} className="mt-4 mb-6">
           <Col span={12}>
             {[5, 4, 3, 2, 1].map((star) => (
@@ -311,7 +286,6 @@ const ProductDetail = () => {
 
         <Divider />
 
-        {/* Reviews */}
         {reviews.map((review, idx) => (
           <motion.div
             key={idx}
@@ -331,9 +305,8 @@ const ProductDetail = () => {
             <Paragraph strong>{review.title}</Paragraph>
             <Paragraph>{review.body}</Paragraph>
             <Text type="secondary">
-              Height: {review.profile.height} &nbsp;|&nbsp; Weight:{" "}
-              {review.profile.weight} &nbsp;|&nbsp; Body Type:{" "}
-              {review.profile.type} &nbsp;|&nbsp; Size Purchased:{" "}
+              Height: {review.profile.height} | Weight: {review.profile.weight}{" "}
+              | Body Type: {review.profile.type} | Size Purchased:{" "}
               {review.profile.size}
             </Text>
           </motion.div>
@@ -341,14 +314,12 @@ const ProductDetail = () => {
 
         <Divider />
 
-        {/* Write Review Button */}
         <div className="text-center mb-4">
           <Button type="primary" onClick={toggleForm}>
             {showForm ? "Close Review Form" : "Write a Review"}
           </Button>
         </div>
 
-        {/* Review Form */}
         {showForm && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -377,6 +348,7 @@ const ProductDetail = () => {
           </motion.div>
         )}
       </div>
+
       <NewArrivals />
     </>
   );

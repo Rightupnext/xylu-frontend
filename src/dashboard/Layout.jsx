@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { MdOutlineDashboardCustomize } from "react-icons/md";
+import { BiSolidStore } from "react-icons/bi";
 import { Button, Dropdown, Layout, Menu, theme, Space, Avatar } from "antd";
 import { Link, Outlet } from "react-router-dom";
+import { TbCategory } from "react-icons/tb";
+import { SlHome } from "react-icons/sl";
 const { Header, Sider } = Layout;
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,22 +42,26 @@ const DashboardLayout = () => {
           mode="inline"
           className="custom-sidebar-menu"
           defaultSelectedKeys={["1"]}
-          
           items={[
             {
               key: "1",
-              icon: <MdOutlineDashboardCustomize />,
-              label: "Home",
+              icon: <SlHome />,
+              label: <Link to="/admin">Home</Link>,
             },
             {
               key: "2",
-              icon: <VideoCameraOutlined />,
-             label: <Link to="category">Category</Link>,
+              icon: <SlHome />,
+              label: <Link to="hero">Hero</Link>,
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
-              label: "Inventory",
+              icon: <TbCategory />,
+              label: <Link to="category">Category</Link>,
+            },
+            {
+              key: "4",
+              icon: <BiSolidStore />,
+              label: <Link to="inventory">Inventory"</Link>,
             },
           ]}
         />

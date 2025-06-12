@@ -12,8 +12,15 @@ import {
   Form,
 } from "antd";
 import { FaTrash } from "react-icons/fa";
-import { UserOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
-import { removeFromCartThunk, updateQuantity } from "../store/slice/CartSlice";
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+} from "@ant-design/icons";
+import {
+  removeFromCartThunk,
+  updateQuantity,
+} from "../store/slice/CartSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const { Title, Text } = Typography;
@@ -39,13 +46,13 @@ export default function AddToCartAntd() {
   const total = subtotal + shipping + tax;
 
   return (
-    <div className="container mx-auto mt-[150px]">
+    <div className="container mx-auto px-4 mt-[150px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="px-4 py-6 mt-20"
+        className="py-6"
       >
-        <Row gutter={[24, 24]} justify="center">
+        <Row gutter={[24, 24]} justify="center" wrap>
           {/* Cart Items */}
           <Col xs={24} lg={16}>
             <Title level={4}>Your Cart</Title>
@@ -56,46 +63,47 @@ export default function AddToCartAntd() {
               cart.map((item, index) => (
                 <div
                   key={`${item.id}-${item.selectedColor}-${item.selectedSize}-${index}`}
+                  className="mb-4"
                 >
                   <Row gutter={[16, 16]} align="middle" wrap>
-                    <Col xs={6} sm={4}>
+                    <Col xs={24} sm={6} className="text-center">
                       <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={80}
-                        height={80}
+                        src={`http://localhost:5005/uploads/${item.image}`}
+                        alt={item.product_name}
+                        width="100%"
+                        style={{ maxWidth: 120, height: "auto" }}
                         preview={false}
-                        className="rounded"
+                        className="rounded mx-auto"
                       />
                     </Col>
-                    <Col xs={14} sm={16}>
-                      <Text strong>{item.title}</Text>
+
+                    <Col xs={24} sm={16}>
+                      <Text strong>{item.product_name}</Text>
                       <br />
-                      <div className="flex gap-3">
-                        <h1 className="text-black"> Size :</h1>
-                        <Button className="w-8 !h-8 !p-0 !rounded-md font-semibold text-sm !bg-black !text-white !border-black">
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-gray-500">Size:</span>
+                        <Button
+                          className="!w-8 !h-8 !p-0 !rounded-md font-semibold text-sm !bg-black !text-white !border-black"
+                          disabled
+                        >
                           {item.selectedSize}
                         </Button>
                       </div>
-                      <br />
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-2 mt-2">
                         <span className="text-gray-500">Color:</span>
-
                         <div
                           className="w-5 h-5 rounded-full border border-gray-300"
                           style={{
-                            backgroundColor: item.selectedColor.toLowerCase(),
+                            backgroundColor:
+                              item.selectedColor?.toLowerCase(),
                           }}
                           title={item.selectedColor}
                         ></div>
-
                         <span className="capitalize text-sm text-gray-700">
                           {item.selectedColor}
                         </span>
                       </div>
-
-                      <br />
-                      <div className="text-black font-semibold mt-1">
+                      <div className="mt-2 text-black font-semibold">
                         ₹{item.price.toFixed(2)}
                       </div>
                       <div className="mt-2 flex items-center gap-2">
@@ -114,14 +122,15 @@ export default function AddToCartAntd() {
                         </Button>
                       </div>
                     </Col>
-                    <Col xs={4} className="text-center">
+
+                    <Col xs={24} sm={2} className="text-center">
                       <Popconfirm
                         title="Remove this item?"
                         onConfirm={() => handleRemove(index)}
                         okText="Yes"
                         cancelText="No"
                       >
-                        <FaTrash className="cursor-pointer text-red-500" />
+                        <FaTrash className="cursor-pointer text-red-500 mt-2" />
                       </Popconfirm>
                     </Col>
                   </Row>
@@ -153,7 +162,7 @@ export default function AddToCartAntd() {
               <Divider />
 
               <div className="space-y-2 text-sm text-black">
-                <div className="flex justify-between text-black">
+                <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-semibold">₹{subtotal.toFixed(2)}</span>
                 </div>
@@ -176,7 +185,7 @@ export default function AddToCartAntd() {
                 type="primary"
                 block
                 size="large"
-                className="mt-4 bg-black hover:bg-gray-800"
+                className="mt-4"
                 style={{ backgroundColor: "black" }}
               >
                 Checkout

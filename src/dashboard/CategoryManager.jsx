@@ -6,7 +6,7 @@ import {
   addCategory,
   updateCategory,
   deleteCategory,
-} from "../store/slice/categorySlice"; // Adjust the path as needed
+} from "../store/slice/categorySlice"; 
 
 const CategoryManager = () => {
   const dispatch = useDispatch();
@@ -95,7 +95,7 @@ const CategoryManager = () => {
 
       <Table
         columns={columns}
-        dataSource={categories}
+        dataSource={categories?.data}
         rowKey="id"
         loading={loading}
         bordered

@@ -1,26 +1,17 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Drawer, Button, Checkbox, Divider } from "antd";
 import { motion } from "framer-motion";
 import { GiHanger } from "react-icons/gi";
 import { MenuOutlined } from "@ant-design/icons";
-import { products } from "../products";
 import { Link, useParams } from "react-router-dom";
-// Filter options
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../store/slice/categorySlice";
+import { fetchProducts } from "../store/slice/productSlice";
+// Normalize string utility
+const normalize = (str) =>
+  typeof str === "string" ? str.toLowerCase().replace(/-/g, " ").trim() : "";
+// Static filters
 const filters = {
-  category: [
-    "Occasion Wear",
-    "Fusion Wear",
-    "By Length",
-    "Ethnic Wear",
-    "Casual Wear",
-    "Formal Wear",
-    "Party Wear",
-    "Work Wear",
-    "Street Style",
-    "Loungewear",
-    "Western Wear",
-    "Festive Wear",
-  ],
   color: [
     "Black",
     "White",
@@ -59,23 +50,23 @@ const filters = {
 
 const ProductCard = ({ product }) => (
   <motion.div
-    className="bg-white rounded-xl  overflow-hidden shadow hover:shadow-lg transition-all"
+    className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition-all"
     whileHover={{ scale: 1.02 }}
   >
     <Link to={`${product.id}`} className="cursor-pointer">
-      <div className="relative ">
+      <div className="relative">
         <img
-          src={product.image}
+          src={`http://localhost:5005/uploads/${product.image}`}
           alt={product.title}
           className="w-full h-73 object-contain"
         />
         <div className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
-          {product.tag}
+          {product.trend}
         </div>
       </div>
       <div className="p-4">
         <h4 className="text-sm text-gray-700 font-semibold mb-1 hover:text-blue-700 cursor-pointer">
-          {product.title}
+          {product.product_name}
         </h4>
         <p className="text-xs text-gray-500">{product.category}</p>
         <div className="flex items-center gap-2 mt-2">
@@ -84,7 +75,7 @@ const ProductCard = ({ product }) => (
             Rs. {product.originalPrice}
           </span>
           <span className="bg-pink-200 text-[#b03a66] px-2 py-0.5 text-xs rounded">
-            30% OFF
+            {product.discount}% OFF
           </span>
         </div>
       </div>
@@ -93,19 +84,18 @@ const ProductCard = ({ product }) => (
 );
 
 const Sidebar = ({ selectedFilters, setSelectedFilters, clearFilters }) => {
-  const normalize = (str) => str.toLowerCase().replace(/-/g, " ").trim();
+  const dispatch = useDispatch();
+  const { categories } = useSelector((state) => state.category);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
   const handleChange = (type, value) => {
     setSelectedFilters((prev) => {
       const current = new Set(prev[type]);
-      if (current.has(value)) {
-        current.delete(value);
-      } else {
-        current.add(value);
-      }
-      return {
-        ...prev,
-        [type]: Array.from(current),
-      };
+      current.has(value) ? current.delete(value) : current.add(value);
+      return { ...prev, [type]: Array.from(current) };
     });
   };
 
@@ -120,16 +110,16 @@ const Sidebar = ({ selectedFilters, setSelectedFilters, clearFilters }) => {
 
       <h4 className="font-semibold mt-4 mb-2 text-black">Category</h4>
       <div className="flex flex-col space-y-2">
-        {filters.category.map((item) => (
+        {categories?.data?.map((item) => (
           <Checkbox
-            key={item}
+            key={item.id || item.category_name}
             checked={selectedFilters.category.some(
-              (cat) => normalize(cat) === normalize(item)
+              (cat) => normalize(cat) === normalize(item.category_name)
             )}
-            onChange={() => handleChange("category", item)}
+            onChange={() => handleChange("category", item.category_name)}
             style={{ transform: "scale(1.3)", transformOrigin: "left center" }}
           >
-            {item}
+            {item.category_name}
           </Checkbox>
         ))}
       </div>
@@ -150,7 +140,6 @@ const Sidebar = ({ selectedFilters, setSelectedFilters, clearFilters }) => {
                 width: "30px",
                 height: "30px",
                 border: isSelected ? "3px solid black" : "2px solid #ccc",
-                outline: "none",
                 cursor: "pointer",
               }}
               title={item}
@@ -176,7 +165,6 @@ const Sidebar = ({ selectedFilters, setSelectedFilters, clearFilters }) => {
               }`}
               type={isSelected ? "default" : "text"}
             >
-              {" "}
               {item}
             </Button>
           );
@@ -187,7 +175,9 @@ const Sidebar = ({ selectedFilters, setSelectedFilters, clearFilters }) => {
 };
 
 const ShopPage = () => {
+  const dispatch = useDispatch();
   const { collections } = useParams();
+  const { products } = useSelector((state) => state.product);
   const [open, setOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     category: collections ? [collections] : [],
@@ -195,33 +185,9 @@ const ShopPage = () => {
     size: [],
   });
 
-  const clearFilters = () =>
-    setSelectedFilters({
-      category: collections ? [collections] : [],
-      color: [],
-      size: [],
-    });
-
-  const normalize = (str) => str.toLowerCase().replace(/-/g, " ").trim();
-
-  const filteredProducts = products.filter((product) => {
-    const categoryMatch =
-      selectedFilters.category.length === 0 ||
-      selectedFilters.category.some(
-        (filterCat) => normalize(filterCat) === normalize(product.category)
-      );
-
-    // color and size as before
-    const colorMatch =
-      selectedFilters.color.length === 0 ||
-      selectedFilters.color.includes(product.color);
-
-    const sizeMatch =
-      selectedFilters.size.length === 0 ||
-      selectedFilters.size.includes(product.size);
-
-    return categoryMatch && colorMatch && sizeMatch;
-  });
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   useEffect(() => {
     setSelectedFilters({
@@ -230,20 +196,49 @@ const ShopPage = () => {
       size: [],
     });
   }, [collections]);
+
+  const clearFilters = () =>
+    setSelectedFilters({
+      category: collections ? [collections] : [],
+      color: [],
+      size: [],
+    });
+
+  const filteredProducts =
+    products?.data?.filter((product) => {
+      const categoryMatch =
+        selectedFilters.category.length === 0 ||
+        selectedFilters.category.some(
+          (filterCat) => normalize(filterCat) === normalize(product.category)
+        );
+
+      const colorMatch =
+        selectedFilters.color.length === 0 ||
+        product.variants.some((variant) =>
+          selectedFilters.color.includes(variant.color)
+        );
+
+      const sizeMatch =
+        selectedFilters.size.length === 0 ||
+        product.variants.some((variant) =>
+          variant.size.some((s) => selectedFilters.size.includes(s))
+        );
+
+      return categoryMatch && colorMatch && sizeMatch;
+    }) || [];
+
   return (
     <div className="flex flex-col md:flex-row sm:mt-[130px] mt-[160px]">
-      {/* Toggle button for small screens */}
       <div className="block md:hidden p-4">
         <Button icon={<MenuOutlined />} onClick={() => setOpen(true)}>
           Filters
         </Button>
       </div>
 
-      {/* Sidebar drawer for small screens */}
       <Drawer
         title="Filters"
         placement="left"
-        closable={true}
+        closable
         onClose={() => setOpen(false)}
         open={open}
         className="md:hidden"
@@ -255,7 +250,6 @@ const ShopPage = () => {
         />
       </Drawer>
 
-      {/* Sticky Sidebar for desktop */}
       <div
         className="hidden md:block w-[250px] border-r"
         style={{
@@ -272,74 +266,42 @@ const ShopPage = () => {
         />
       </div>
 
-      {/* Product list */}
-      {filteredProducts.length === 0 ? (
-        <div className="  flex items-center justify-center p-4 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl w-full text-center px-4 py-8 rounded-2xl shadow-xl"
-          >
+      <div className="flex-1 p-4">
+        {filteredProducts.length === 0 ? (
+          <div className="flex items-center justify-center p-4 w-full">
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-2xl w-full text-center px-4 py-8 rounded-2xl shadow-xl"
             >
-              <GiHanger className="mx-auto text-6xl md:text-7xl text-rose-200" />
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-3xl md:text-4xl font-semibold text-gray-800 mb-4"
-            >
-              Dress Collection Not Found
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-gray-600 mb-8 text-lg"
-            >
-              We apologize, but the collection you're looking for is currently
-              unavailable
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="space-y-4 md:space-y-0 md:space-x-4"
-            >
+              <GiHanger className="mx-auto text-6xl md:text-7xl text-rose-200 mb-4" />
+              <h1 className="text-3xl md:text-4xl font-semibold text-gray-800 mb-2">
+                Dress Collection Not Found
+              </h1>
+              <p className="text-gray-600 mb-6 text-lg">
+                We apologize, but the collection you're looking for is currently
+                unavailable.
+              </p>
               <button
-                className="px-8 py-3 bg-[#c97a9f] text-white rounded-full font-medium transform transition-all hover:bg-[#a44c6c] cursor-pointer hover:scale-105 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50"
+                className="px-8 py-3 bg-[#c97a9f] text-white rounded-full font-medium hover:bg-[#a44c6c] hover:scale-105 transition-all"
                 onClick={() => window.history.back()}
               >
                 Return to Collections
               </button>
+              <div className="mt-12 text-sm text-gray-500">
+                Need assistance? Contact our support team
+              </div>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
-              className="mt-12 text-sm text-gray-500"
-            >
-              Need assistance? Contact our support team
-            </motion.div>
-          </motion.div>
-        </div>
-      ) : (
-        <div className="flex-1 p-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 overflow-auto">
-          {filteredProducts.map((product, idx) => (
-            <ProductCard key={idx} product={product} />
-          ))}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -16,6 +16,7 @@ import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import ScrollToTop from './ScrollToTop'
 import CategoryManager from "./dashboard/CategoryManager";
+import InventoryManager from "./dashboard/InventoryManager";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -68,6 +69,7 @@ function App() {
         >
           <Route index element={<HomeDashboard />} />
           <Route path="category" element={<CategoryManager />} />
+          <Route path="inventory" element={<InventoryManager />} />
         </Route>
 
         {/* 🔓 LOGIN (only when logged out) */}

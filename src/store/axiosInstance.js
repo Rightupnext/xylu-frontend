@@ -15,10 +15,11 @@ axiosInstance.interceptors.request.use(
     const authToken = token.get();
     const originalData = config.data;
 
-    if (originalData) {
+    if (originalData && !(originalData instanceof FormData)) {
       config.data = {
         encryptedData: encrypt(originalData),
       };
+      config.headers["Content-Type"] = "application/json";
     }
 
     if (authToken) {

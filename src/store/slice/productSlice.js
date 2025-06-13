@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk(
 // 2. Add a new product with variants
 export const addProduct = createAsyncThunk(
   "product/addProduct",
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       const res = await axiosInstance.post("/products", data, {
         headers: {
@@ -26,6 +26,7 @@ export const addProduct = createAsyncThunk(
         },
       });
       notification.success({ message: "Product added successfully" });
+      dispatch(fetchProducts());
       return res.data;
     } catch (err) {
       const errorData = err?.response?.data;
@@ -43,7 +44,7 @@ export const addProduct = createAsyncThunk(
 // 3. Update a product and its variants
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
-  async ({ id, data }, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue, dispatch }) => {
     try {
       const res = await axiosInstance.put(`/products/${id}`, data, {
         headers: {
@@ -51,7 +52,11 @@ export const updateProduct = createAsyncThunk(
         },
       });
       notification.success({ message: "Product updated" });
-      return { id, ...data };
+
+      // Re-fetch updated list
+      dispatch(fetchProducts());
+
+      return { id, ...data }; // Optional: or return nothing
     } catch (err) {
       notification.error({
         message: "Update failed",
@@ -65,10 +70,11 @@ export const updateProduct = createAsyncThunk(
 // 4. Delete a product
 export const deleteProduct = createAsyncThunk(
   "product/deleteProduct",
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, dispatch }) => {
     try {
       await axiosInstance.delete(`/products/${id}`);
       notification.success({ message: "Product deleted" });
+      dispatch(fetchProducts());
       return id;
     } catch (err) {
       notification.error({

@@ -1,39 +1,19 @@
 import { Carousel, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import slide1 from "../assets/hero/slide1.jpg";
-import slide2 from "../assets/hero/slide2.jpg";
-import slide3 from "../assets/hero/slide2.jpg";
-import slide4 from "../assets/hero/slide 4.png";
 import WelcomPage from "./WelcomPage";
-
-const carouselData = [
-  {
-    bg: slide1,
-    date: "10–16 March",
-    buttonLabel: "SHOP NOW",
-  },
-  {
-    bg: slide2,
-    date: "SUMMER DROP",
-    buttonLabel: "SHOP NOW",
-  },
-  {
-    bg: slide3,
-    date: "10–16 March",
-    buttonLabel: "SHOP NOW",
-  },
-  {
-    bg: slide4,
-    date: "SUMMER DROP",
-    buttonLabel: "SHOP NOW",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { fetchHeroes } from "../store/slice/heroSlice";
 
 export default function Hero() {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
 
+  const { heroImages, loading } = useSelector((state) => state.hero);
+  useEffect(() => {
+    dispatch(fetchHeroes());
+  }, [dispatch]);
   // Open modal when on homepage
   useEffect(() => {
     if (location.pathname === "/") {
@@ -62,11 +42,11 @@ export default function Hero() {
       return () => clearTimeout(timer);
     }
   }, [location.pathname]);
-useEffect(() => {
+  useEffect(() => {
     if (isModalOpen) {
       const closeTimer = setTimeout(() => {
         setIsModalOpen(false);
-      }, 20000); 
+      }, 20000);
 
       return () => clearTimeout(closeTimer);
     }
@@ -74,11 +54,11 @@ useEffect(() => {
   return (
     <>
       <Carousel autoplay dots>
-        {carouselData.map((slide, index) => (
+        {heroImages.map((slide, index) => (
           <div key={index}>
             <div className="relative w-full h-[82vh] overflow-hidden mt-[130px]">
               <img
-                src={slide.bg}
+                src={`http://localhost:5005/uploads/hero/${slide.filename}`}
                 alt={`Slide ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -88,7 +68,7 @@ useEffect(() => {
                   style={{ color: "white" }}
                   className="w-[220px] rounded-3xl cursor-pointer h-[60px] bg-[#c97a9f] hover:bg-[#a44c6c] focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                 >
-                  {slide.buttonLabel}
+                  Shop Now
                 </button>
               </div>
             </div>

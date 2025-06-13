@@ -14,27 +14,28 @@ import HomeDashboard from "./dashboard/HomeDashboard";
 
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
-import ScrollToTop from './ScrollToTop'
+import ScrollToTop from "./ScrollToTop";
 import CategoryManager from "./dashboard/CategoryManager";
 import InventoryManager from "./dashboard/InventoryManager";
+import PageNotFound from "./PageNotFound";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
 
   return (
     <>
-    <ScrollToTop/>
+      <ScrollToTop />
       {!isAdminPath && <Navbar />}
 
       <Routes>
         {/* 🔓 PUBLIC ROUTES */}
         <Route path="/" element={<Home />} />
-        <Route path="/:collections" element={<Collection />} />
+        <Route path="/collections/:collections" element={<Collection />} />
         <Route path="/contact" element={<ContactPage />} />
 
         {/* 🔒 PRIVATE ROUTES (authenticated users only) */}
         <Route
-          path="/:collection/:id"
+          path="/collections/:collections/:id"
           element={
             // <PrivateRoute>
             <ProductDetail />
@@ -81,6 +82,7 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
 
       {!isAdminPath && <Footer />}

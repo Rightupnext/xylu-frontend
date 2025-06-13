@@ -7,7 +7,7 @@ const initialState = {
 
 export const addToCartThunk = createAsyncThunk(
   "cart/addToCartThunk",
-  async ({ product, selectedColor, selectedSize }, { dispatch }) => {
+  async ({ product, selectedColor, selectedSize, quantity }, { dispatch }) => {
     if (!selectedColor || !selectedSize) {
       notification.error({
         message: "Selection required",
@@ -17,7 +17,7 @@ export const addToCartThunk = createAsyncThunk(
       throw new Error("Color and size selection required");
     }
 
-    dispatch(addToCart({ product, selectedColor, selectedSize }));
+    dispatch(addToCart({ product, selectedColor, selectedSize, quantity }));
     notification.open({
       type: "success",
       message: "Added to cart",
@@ -45,7 +45,7 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart(state, action) {
-      const { product, selectedColor, selectedSize } = action.payload;
+      const { product, selectedColor, selectedSize, quantity } = action.payload;
 
       const existingIndex = state.items.findIndex(
         (item) =>
@@ -55,10 +55,10 @@ const cartSlice = createSlice({
       );
 
       if (existingIndex !== -1) {
-        // Increase quantity
-        state.items[existingIndex].quantity += 1;
+        // Increase quantity by selected amount
+        state.items[existingIndex].quantity += quantity || 1;
       } else {
-        // Add new item
+        // Add new item with specified quantity
         state.items.push({
           id: product.id,
           product_name: product.product_name,
@@ -68,7 +68,7 @@ const cartSlice = createSlice({
           tag: product.tag,
           selectedColor,
           selectedSize,
-          quantity: 1,
+          quantity: quantity || 1,
         });
       }
 

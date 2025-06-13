@@ -16,12 +16,15 @@ import { UserOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
 import { removeFromCartThunk, updateQuantity } from "../store/slice/CartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { token } from "../auth/index";
 const { Title, Text } = Typography;
 
 export default function AddToCartAntd() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.items);
+  const userid = token.getUser();
   const [customerInfo, setCustomerInfo] = useState({
+    id: userid.id,
     name: "",
     email: "",
     phone: "",
@@ -67,52 +70,33 @@ export default function AddToCartAntd() {
       const customer = JSON.parse(localStorage.getItem("customerInfo"));
       const cartItems = JSON.parse(localStorage.getItem("cartItems"));
 
-      if (
-        !customer?.name ||
-        !customer?.email ||
-        !customer?.phone ||
-        !customer?.address
-      ) {
-        return alert("Please fill all customer details.");
-      }
-
-      if (!window.Razorpay) {
-        alert("Razorpay SDK not loaded");
-        return;
+      if (!customer || !cartItems || cartItems.length === 0) {
+        return alert("Missing cart or customer info");
       }
 
       const res = await axios.post("http://localhost:5005/order/create-order", {
-        amount: total * 100,
+        customer,
+        cartItems,
+        subtotal,
+        shipping,
+        tax,
+        total,
       });
 
       const { id, amount, currency } = res.data;
-      if (!id || !amount || !currency) {
-        alert("Invalid order details from server");
-        return;
-      }
 
       const options = {
-        key: "rzp_test_kEGdW4r5lUTJVS",
+        key: "rzp_test_nhhCl0y64g4Yt5",
         amount,
         currency,
         order_id: id,
         name: "My Shop",
-        description: "Order Payment",
         handler: async (response) => {
-          await axios.post("http://localhost:5000/confirm-order", {
-            customer,
-            cartItems,
-            subtotal,
-            shipping,
-            tax,
-            total,
-            paymentDetails: {
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-            },
+          await axios.post("http://localhost:5005/order/confirm-order", {
+            paymentDetails: response,
           });
-          alert("Payment successful and order placed!");
+
+          alert("Payment successful!");
           localStorage.removeItem("cartItems");
           localStorage.removeItem("customerInfo");
           window.location.reload();
@@ -122,14 +106,13 @@ export default function AddToCartAntd() {
           email: customer.email,
           contact: customer.phone,
         },
-        theme: { color: "#000" },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (err) {
-      console.error("Checkout failed", err);
-      alert("Something went wrong during checkout.");
+      console.error(err);
+      alert("Checkout failed");
     }
   };
 

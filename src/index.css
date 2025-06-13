@@ -38,3 +38,11 @@ body{
   background-color: #c97a9f !important;
   color: white !important;
 }
+.custom-step-line .ant-steps-item-process .ant-steps-item-icon {
+  border-color: var(--line-color) !important;
+  background-color: var(--line-color) !important;
+}
+
+.custom-step-line .ant-steps-item-process .ant-steps-item-tail::after {
+  background-color: var(--line-color) !important;
+}

@@ -66,6 +66,8 @@ const cartSlice = createSlice({
           originalPrice: product.originalPrice,
           image: product.image,
           tag: product.tag,
+          product_code:product.product_code,
+          discount:product.discount,
           selectedColor,
           selectedSize,
           quantity: quantity || 1,

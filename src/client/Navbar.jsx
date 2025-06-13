@@ -5,16 +5,18 @@ import {
   SearchOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import { FaRegUserCircle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { IoLogoYoutube } from "react-icons/io5";
 import { FaInstagramSquare } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useCycle } from "framer-motion";
 import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import { GiAmpleDress } from "react-icons/gi";
-import { Avatar, Badge } from "antd";
+import { Avatar, Badge, Popover } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../store/slice/categorySlice";
+
 const collectionItems = [
   "Occasion Wear",
   "Fusion Wear",
@@ -113,15 +115,62 @@ export default function Navbar() {
         </div>
 
         {/* Right Icons */}
-        <div className="flex space-x-[20px] text-black items-center text-lg">
-          <SearchOutlined />
+        <div className="flex space-x-4 items-center text-lg text-black">
+          <SearchOutlined className="cursor-pointer" />
+
           <Link to="/cart">
-            <Badge count={distinctCount} showZero={true}>
-              <ShoppingOutlined className="text-3xl" />
+            <Badge count={distinctCount} showZero>
+              <ShoppingOutlined className="text-2xl" />
             </Badge>
           </Link>
+
+          {/* Animated Avatar */}
+          <div className="relative w-10 h-10">
+            <motion.div
+              initial={{ scale: 1, opacity: 0.8 }}
+              animate={{
+                scale: [1, 2],
+                opacity: [0.8, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                ease: "easeInOut",
+                repeat: Infinity,
+              }}
+              className="absolute top-0 left-0 w-10 h-10 rounded-full border-2 border-pink-500 z-0"
+            />
+            <div className="relative z-10 w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+              <Popover
+                content="My Order"
+                placement="bottom"
+                style={{ backgroundColor: "black" }}
+              >
+                <div className="relative w-10 h-10">
+                  {/* Pink Wave Animation */}
+                  <motion.div
+                    initial={{ scale: 1, opacity: 0.8 }}
+                    animate={{ scale: [1, 2], opacity: [0.8, 0] }}
+                    transition={{
+                      duration: 1.5,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                    }}
+                    className="absolute top-0 left-0 w-10 h-10 rounded-full border-2 border-pink-500 z-0"
+                  />
+
+                  {/* Avatar Icon */}
+                  <div className="relative z-10 w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center cursor-pointer">
+                    <Link to="/order">
+                      <FaRegUserCircle className="text-pink-500 text-xl" />
+                    </Link>
+                  </div>
+                </div>
+              </Popover>
+            </div>
+          </div>
+
           <TiThMenu
-            className="sm:hidden cursor-pointer ml-[20px] text-3xl"
+            className="md:hidden cursor-pointer text-3xl"
             onClick={() => setIsMobileMenuOpen(true)}
           />
         </div>

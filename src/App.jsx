@@ -19,6 +19,7 @@ import CategoryManager from "./dashboard/CategoryManager";
 import InventoryManager from "./dashboard/InventoryManager";
 import PageNotFound from "./PageNotFound";
 import HeroImageUpload from "./dashboard/HeroImageUpload";
+import OrderHistory from "./client/OrderHistory";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -46,8 +47,16 @@ function App() {
         <Route
           path="/faq"
           element={
+            // <PrivateRoute>
+            <FaqSection />
+            // </PrivateRoute>
+          }
+        />
+        <Route
+          path="/order"
+          element={
             <PrivateRoute>
-              <FaqSection />
+              <OrderHistory />
             </PrivateRoute>
           }
         />

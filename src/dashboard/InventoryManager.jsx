@@ -11,6 +11,7 @@ import {
   Row,
   Col,
   Tag,
+  Popconfirm,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -73,6 +74,10 @@ const InventoryManager = () => {
   const [existingImageName, setExistingImageName] = useState(null);
   const [colorSearchText, setColorSearchText] = useState("");
   const [openDropdown, setOpenDropdown] = useState({});
+  const [searchText, setSearchText] = useState("");
+  const filteredProducts = products?.data?.filter((product) =>
+    product.product_name.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -132,7 +137,9 @@ const InventoryManager = () => {
     formData.append("variants", JSON.stringify(variants));
 
     if (editId) {
-      dispatch(updateProduct({ id: editId, data: formData }));
+      dispatch(updateProduct({ id: editId, data: formData })).then(() => {
+        dispatch(fetchProducts());
+      });
     } else {
       dispatch(addProduct(formData)).then(() => {
         dispatch(fetchProducts());
@@ -158,9 +165,13 @@ const InventoryManager = () => {
       render: (variants) =>
         variants?.map((v, i) => (
           <div key={i}>
-            <small>
-              {v.color}, {Array.isArray(v.size) ? v.size.join(", ") : v.size},
-              Qty: {v.quantity}
+            <small style={{ fontSize: 16 }}>
+              <span style={{ color: v.color?.toLowerCase() }}>
+                {v.color?.charAt(0).toUpperCase() +
+                  v.color?.slice(1).toLowerCase()}
+              </span>
+              , {Array.isArray(v.size) ? v.size.join(" ") : v.size}, Qty:{" "}
+              {v.quantity}
             </small>
           </div>
         )),
@@ -172,33 +183,47 @@ const InventoryManager = () => {
           <Button onClick={() => openModal(record)} type="link">
             Edit
           </Button>
-          <Button danger onClick={() => handleDelete(record.id)} type="link">
-            Delete
-          </Button>
+          <Popconfirm
+            title="Are you sure to delete this product?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger type="link">
+              Delete
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },
   ];
 
   return (
-    <div>
-      <Button
-        type="primary"
-        onClick={() => openModal()}
-        style={{
-          marginBottom: 16,
-          marginTop: 12,
-          marginLeft: 12,
-          backgroundColor: "black",
-          color: "white",
-          padding: "20px",
-        }}
-      >
-        Add Product
-      </Button>
-
+    <div className="">
+      <div className="flex w-full justify-between p-4">
+        <Button
+          type="primary"
+          onClick={() => openModal()}
+          style={{
+            marginBottom: 16,
+            marginTop: 12,
+            marginLeft: 12,
+            backgroundColor: "black",
+            color: "white",
+            padding: "20px",
+          }}
+        >
+          Add Product
+        </Button>
+        <Input
+          placeholder="Search by product name"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: 300, marginLeft: 12, marginBottom: 16 }}
+        />
+      </div>
       <Table
-        dataSource={products?.data}
+        dataSource={filteredProducts}
         rowKey="id"
         columns={columns}
         loading={loading}

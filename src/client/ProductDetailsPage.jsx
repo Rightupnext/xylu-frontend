@@ -10,6 +10,8 @@ import {
   Progress,
   Input,
   Form,
+  Skeleton,
+  InputNumber,
 } from "antd";
 import { motion } from "framer-motion";
 import NewArrivals from "./NewArrivals";
@@ -27,16 +29,44 @@ const ProductDetail = () => {
   const dispatch = useDispatch();
   const { selectedProduct } = useSelector((state) => state.product);
   const { id } = useParams();
+  const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    dispatch(getProductById(id));
-  }, [dispatch, id]);
-
+  const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [showForm, setShowForm] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    dispatch(getProductById(id)).finally(() => setLoading(false));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (selectedProduct?.variants?.length) {
+      // Select the first available color
+      const firstColor = selectedProduct.variants[0].color;
+      setSelectedColor(firstColor);
+
+      // Find the first variant with the first color and select its first size
+      const sizeList = selectedProduct.variants.find(
+        (v) => v.color === firstColor
+      )?.size;
+
+      if (sizeList?.length > 0) {
+        setSelectedSize(sizeList[0]);
+      }
+    }
+  }, [selectedProduct]);
 
   const toggleForm = () => setShowForm((prev) => !prev);
+  const handleQuantityChange = (delta) => {
+    const newQty = Math.max(1, quantity + delta);
+    setQuantity(newQty);
+  };
+
+  const handleQuantitySet = (value) => {
+    const newQty = Math.max(1, value || 1);
+    setQuantity(newQty);
+  };
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
@@ -49,6 +79,7 @@ const ProductDetail = () => {
         product: selectedProduct,
         selectedColor,
         selectedSize,
+        quantity,
       })
     );
   };
@@ -96,8 +127,20 @@ const ProductDetail = () => {
     },
   ];
 
-  if (!selectedProduct)
-    return <div className="text-center p-10">Product not found</div>;
+  if (loading || !selectedProduct) {
+    return (
+      <div className="max-w-screen-xl mx-auto p-6 mt-[170px]">
+        <Row gutter={[32, 32]}>
+          <Col xs={24} md={12}>
+            <Skeleton.Image active style={{ width: 400, height: 400 }} />
+          </Col>
+          <Col xs={24} md={12}>
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </Col>
+        </Row>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -135,16 +178,14 @@ const ProductDetail = () => {
                 </Text>
               </div>
 
-              {/* Color Selection */}
-              <Text strong>Color:</Text>
+              <Text strong>Available Color:</Text>
               <div className="my-2">
                 <div style={{ display: "flex", alignItems: "center" }}>
                   {getAvailableColors().map((color) => (
                     <Button
-                      key={color.name}
+                      key={color}
                       onClick={() => setSelectedColor(color)}
                       style={{
-                        position: "relative",
                         backgroundColor: color,
                         borderRadius: "50%",
                         width: 50,
@@ -157,14 +198,12 @@ const ProductDetail = () => {
                         padding: 0,
                       }}
                     >
-                      {/* Tick mark positioned absolute on top center */}
                       {selectedColor === color && (
                         <span
                           style={{
                             color: "pink",
                             fontWeight: "bold",
                             fontSize: 24,
-                            lineHeight: "50px",
                           }}
                         >
                           ✓
@@ -174,10 +213,9 @@ const ProductDetail = () => {
                   ))}
                 </div>
               </div>
-              {/* Size Selection */}
               {selectedColor && (
                 <>
-                  <Text strong>Size:</Text>
+                  <Text strong>Available Size:</Text>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {getAvailableSizes().map((size) => (
                       <Button
@@ -195,7 +233,26 @@ const ProductDetail = () => {
                   </div>
                 </>
               )}
+              <div className="mt-2 flex items-center gap-2">
+                <Button
+                  size="small"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                >
+                  −
+                </Button>
 
+                <InputNumber
+                  min={1}
+                  value={quantity}
+                  onChange={handleQuantitySet}
+                  style={{ width: 70, textAlign: "center" }}
+                />
+
+                <Button size="small" onClick={() => handleQuantityChange(1)}>
+                  +
+                </Button>
+              </div>
               <Divider />
               <Paragraph>{selectedProduct?.description}</Paragraph>
               <Divider />
@@ -205,6 +262,7 @@ const ProductDetail = () => {
                 block
                 size="large"
                 onClick={handleAddToCart}
+                disabled={loading}
                 style={{ backgroundColor: "#4a1f2e", border: "none" }}
               >
                 ADD TO BAG
@@ -250,7 +308,6 @@ const ProductDetail = () => {
           </Col>
         </Row>
       </div>
-
       <div className="max-w-7xl mx-auto p-6">
         <Title level={4}>5.0 Overall Rating</Title>
         <Rate allowHalf disabled defaultValue={5} />
@@ -348,7 +405,6 @@ const ProductDetail = () => {
           </motion.div>
         )}
       </div>
-
       <NewArrivals />
     </>
   );

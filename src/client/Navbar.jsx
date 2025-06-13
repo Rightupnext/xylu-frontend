@@ -90,7 +90,7 @@ export default function Navbar() {
                     {categories?.data?.map((item, index) => (
                       <Link
                         key={index}
-                        to={`/${item.category_name
+                        to={`/collections/${item.category_name
                           .toLowerCase()
                           .replace(/\s/g, "-")}`}
                       >

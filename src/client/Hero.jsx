@@ -76,11 +76,11 @@ useEffect(() => {
       <Carousel autoplay dots>
         {carouselData.map((slide, index) => (
           <div key={index}>
-            <div className="relative w-full h-[100vh] overflow-hidden">
+            <div className="relative w-full h-[82vh] overflow-hidden mt-[130px]">
               <img
                 src={slide.bg}
                 alt={`Slide ${index + 1}`}
-                className="w-full h-full"
+                className="w-full h-full object-cover"
               />
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
                 <button

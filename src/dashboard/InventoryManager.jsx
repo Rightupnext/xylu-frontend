@@ -75,9 +75,19 @@ const InventoryManager = () => {
   const [colorSearchText, setColorSearchText] = useState("");
   const [openDropdown, setOpenDropdown] = useState({});
   const [searchText, setSearchText] = useState("");
-  const filteredProducts = products?.data?.filter((product) =>
-    product.product_name.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredProducts = products?.data?.filter((product) => {
+    const normalizedSearch = searchText.toLowerCase().replace(/\s+/g, "");
+
+    const normalize = (str) => str?.toLowerCase().replace(/\s+/g, "") || "";
+
+    const matchesProduct =
+      normalize(product.product_name).includes(normalizedSearch) ||
+      normalize(product.product_code).includes(normalizedSearch) ||
+      normalize(product.category).includes(normalizedSearch) ||
+      normalize(product.trend).includes(normalizedSearch);
+
+    return matchesProduct;
+  });
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -137,13 +147,9 @@ const InventoryManager = () => {
     formData.append("variants", JSON.stringify(variants));
 
     if (editId) {
-      dispatch(updateProduct({ id: editId, data: formData })).then(() => {
-        dispatch(fetchProducts());
-      });
+      dispatch(updateProduct({ id: editId, data: formData }));
     } else {
-      dispatch(addProduct(formData)).then(() => {
-        dispatch(fetchProducts());
-      });
+      dispatch(addProduct(formData));
     }
 
     setIsModalOpen(false);
@@ -162,19 +168,52 @@ const InventoryManager = () => {
     {
       title: "Variants",
       dataIndex: "variants",
-      render: (variants) =>
-        variants?.map((v, i) => (
-          <div key={i}>
-            <small style={{ fontSize: 16 }}>
-              <span style={{ color: v.color?.toLowerCase() }}>
+      render: (variants) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {/* Header Row */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: "8px",
+              fontSize: 14,
+              fontWeight: 600,
+              padding: "8px",
+              backgroundColor: "#f0f0f0",
+              border: "1px solid #d9d9d9",
+              borderRadius: "4px",
+            }}
+          >
+            <span>Color</span>
+            <span>Size</span>
+            <span>Qty</span>
+          </div>
+
+          {/* Data Rows */}
+          {variants?.map((v, i) => (
+            <div
+              key={i}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "8px",
+                fontSize: 14,
+                border: "1px solid #d9d9d9",
+                padding: "8px",
+                borderRadius: "4px",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              <span style={{ color: v.color?.toLowerCase(), fontWeight: 500 }}>
                 {v.color?.charAt(0).toUpperCase() +
                   v.color?.slice(1).toLowerCase()}
               </span>
-              , {Array.isArray(v.size) ? v.size.join(" ") : v.size}, Qty:{" "}
-              {v.quantity}
-            </small>
-          </div>
-        )),
+              <span>{Array.isArray(v.size) ? v.size.join(", ") : v.size}</span>
+              <span>{v.quantity}</span>
+            </div>
+          ))}
+        </div>
+      ),
     },
     {
       title: "Actions",

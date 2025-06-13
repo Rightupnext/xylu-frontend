@@ -18,6 +18,7 @@ import ScrollToTop from "./ScrollToTop";
 import CategoryManager from "./dashboard/CategoryManager";
 import InventoryManager from "./dashboard/InventoryManager";
 import PageNotFound from "./PageNotFound";
+import HeroImageUpload from "./dashboard/HeroImageUpload";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -69,6 +70,7 @@ function App() {
           }
         >
           <Route index element={<HomeDashboard />} />
+          <Route path="hero" element={<HeroImageUpload />} />
           <Route path="category" element={<CategoryManager />} />
           <Route path="inventory" element={<InventoryManager />} />
         </Route>

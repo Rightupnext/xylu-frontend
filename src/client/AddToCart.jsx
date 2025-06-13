@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Row,
@@ -12,23 +12,26 @@ import {
   Form,
 } from "antd";
 import { FaTrash } from "react-icons/fa";
-import {
-  UserOutlined,
-  MailOutlined,
-  PhoneOutlined,
-} from "@ant-design/icons";
-import {
-  removeFromCartThunk,
-  updateQuantity,
-} from "../store/slice/CartSlice";
+import { UserOutlined, MailOutlined, PhoneOutlined } from "@ant-design/icons";
+import { removeFromCartThunk, updateQuantity } from "../store/slice/CartSlice";
 import { useDispatch, useSelector } from "react-redux";
-
+import axios from "axios";
 const { Title, Text } = Typography;
 
 export default function AddToCartAntd() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.items);
-
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+  const handleInputChange = (field, value) => {
+    const updated = { ...customerInfo, [field]: value };
+    setCustomerInfo(updated);
+    localStorage.setItem("customerInfo", JSON.stringify(updated));
+  };
   const handleQuantityChange = (index, delta) => {
     dispatch(updateQuantity({ index, delta }));
   };
@@ -44,6 +47,91 @@ export default function AddToCartAntd() {
   const shipping = 2;
   const tax = 4;
   const total = subtotal + shipping + tax;
+  useEffect(() => {
+    const savedCustomer = localStorage.getItem("customerInfo");
+    if (savedCustomer) {
+      setCustomerInfo(JSON.parse(savedCustomer));
+    }
+  }, []); // 👈 empty dependency array so it runs on mount only
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => console.log("Razorpay script loaded");
+    document.body.appendChild(script);
+  }, []);
+
+  const handleCheckout = async () => {
+    try {
+      const customer = JSON.parse(localStorage.getItem("customerInfo"));
+      const cartItems = JSON.parse(localStorage.getItem("cartItems"));
+
+      if (
+        !customer?.name ||
+        !customer?.email ||
+        !customer?.phone ||
+        !customer?.address
+      ) {
+        return alert("Please fill all customer details.");
+      }
+
+      if (!window.Razorpay) {
+        alert("Razorpay SDK not loaded");
+        return;
+      }
+
+      const res = await axios.post("http://localhost:5005/order/create-order", {
+        amount: total * 100,
+      });
+
+      const { id, amount, currency } = res.data;
+      if (!id || !amount || !currency) {
+        alert("Invalid order details from server");
+        return;
+      }
+
+      const options = {
+        key: "rzp_test_kEGdW4r5lUTJVS",
+        amount,
+        currency,
+        order_id: id,
+        name: "My Shop",
+        description: "Order Payment",
+        handler: async (response) => {
+          await axios.post("http://localhost:5000/confirm-order", {
+            customer,
+            cartItems,
+            subtotal,
+            shipping,
+            tax,
+            total,
+            paymentDetails: {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            },
+          });
+          alert("Payment successful and order placed!");
+          localStorage.removeItem("cartItems");
+          localStorage.removeItem("customerInfo");
+          window.location.reload();
+        },
+        prefill: {
+          name: customer.name,
+          email: customer.email,
+          contact: customer.phone,
+        },
+        theme: { color: "#000" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error("Checkout failed", err);
+      alert("Something went wrong during checkout.");
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 mt-[150px]">
@@ -80,8 +168,8 @@ export default function AddToCartAntd() {
                     <Col xs={24} sm={16}>
                       <Text strong>{item.product_name}</Text>
                       <br />
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-gray-500">Size:</span>
+                      <div className="flex items-center gap-4 mt-1">
+                        <span className="text-gray-500">Available Size:</span>
                         <Button
                           className="!w-8 !h-8 !p-0 !rounded-md font-semibold text-sm !bg-black !text-white !border-black"
                           disabled
@@ -90,12 +178,11 @@ export default function AddToCartAntd() {
                         </Button>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-gray-500">Color:</span>
+                        <span className="text-gray-500">Available Color:</span>
                         <div
-                          className="w-5 h-5 rounded-full border border-gray-300"
+                          className="!w-8 !h-8 !p-0 !rounded-md font-semibold text-sm"
                           style={{
-                            backgroundColor:
-                              item.selectedColor?.toLowerCase(),
+                            backgroundColor: item.selectedColor?.toLowerCase(),
                           }}
                           title={item.selectedColor}
                         ></div>
@@ -145,17 +232,42 @@ export default function AddToCartAntd() {
             <div className="bg-[#eff1f2] p-6 rounded shadow-sm">
               <Title level={5}>Enter Details</Title>
               <Form layout="vertical">
-                <Form.Item name="fullname">
-                  <Input placeholder="Full Name" prefix={<UserOutlined />} />
+                <Form.Item label="Full Name">
+                  <Input
+                    placeholder="Full Name"
+                    prefix={<UserOutlined />}
+                    value={customerInfo.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                  />
                 </Form.Item>
-                <Form.Item name="email">
-                  <Input placeholder="Email" prefix={<MailOutlined />} />
+
+                <Form.Item label="Email">
+                  <Input
+                    placeholder="Email"
+                    prefix={<MailOutlined />}
+                    value={customerInfo.email}
+                    onChange={(e) => handleInputChange("email", e.target.value)}
+                  />
                 </Form.Item>
-                <Form.Item name="phone">
-                  <Input placeholder="Phone No." prefix={<PhoneOutlined />} />
+
+                <Form.Item label="Phone No.">
+                  <Input
+                    placeholder="Phone No."
+                    prefix={<PhoneOutlined />}
+                    value={customerInfo.phone}
+                    onChange={(e) => handleInputChange("phone", e.target.value)}
+                  />
                 </Form.Item>
-                <Form.Item name="address">
-                  <Input.TextArea rows={3} placeholder="Address" />
+
+                <Form.Item label="Address">
+                  <Input.TextArea
+                    rows={3}
+                    placeholder="Address"
+                    value={customerInfo.address}
+                    onChange={(e) =>
+                      handleInputChange("address", e.target.value)
+                    }
+                  />
                 </Form.Item>
               </Form>
 
@@ -187,6 +299,7 @@ export default function AddToCartAntd() {
                 size="large"
                 className="mt-4"
                 style={{ backgroundColor: "black" }}
+                onClick={handleCheckout}
               >
                 Checkout
               </Button>

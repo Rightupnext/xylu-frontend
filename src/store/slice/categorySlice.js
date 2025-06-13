@@ -18,10 +18,11 @@ export const fetchCategories = createAsyncThunk(
 // 2. Add a new category
 export const addCategory = createAsyncThunk(
   "category/addCategory",
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       const res = await axiosInstance.post("/categories", data);
       notification.success({ message: "Category added successfully" });
+      dispatch(fetchCategories());
       return res;
     } catch (err) {
       notification.error({
@@ -36,10 +37,11 @@ export const addCategory = createAsyncThunk(
 // 3. Update a category
 export const updateCategory = createAsyncThunk(
   "category/updateCategory",
-  async ({ id, data }, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue, dispatch }) => {
     try {
       const res = await axiosInstance.put(`/categories/${id}`, data);
       notification.success({ message: "Category updated" });
+      dispatch(fetchCategories());
       return { id, ...data };
     } catch (err) {
       notification.error({
@@ -54,10 +56,11 @@ export const updateCategory = createAsyncThunk(
 // 4. Delete a category
 export const deleteCategory = createAsyncThunk(
   "category/deleteCategory",
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, dispatch }) => {
     try {
       await axiosInstance.delete(`/categories/${id}`);
       notification.success({ message: "Category deleted" });
+      dispatch(fetchCategories());
       return id;
     } catch (err) {
       notification.error({

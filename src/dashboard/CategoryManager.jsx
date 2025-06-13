@@ -6,7 +6,7 @@ import {
   addCategory,
   updateCategory,
   deleteCategory,
-} from "../store/slice/categorySlice"; 
+} from "../store/slice/categorySlice";
 
 const CategoryManager = () => {
   const dispatch = useDispatch();
@@ -38,7 +38,6 @@ const CategoryManager = () => {
           dispatch(updateCategory({ id: editingCategory.id, data: values }));
         } else {
           dispatch(addCategory(values));
-          dispatch(fetchCategories());
         }
         setIsModalVisible(false);
       })
@@ -48,9 +47,7 @@ const CategoryManager = () => {
   };
 
   const handleDelete = (id) => {
-    dispatch(deleteCategory(id)).then(() => {
-      dispatch(fetchCategories());
-    });
+    dispatch(deleteCategory(id));
   };
 
   const columns = [
@@ -88,7 +85,7 @@ const CategoryManager = () => {
       <Button
         type="primary"
         onClick={() => showModal()}
-        style={{ marginBottom: 16 }}
+        style={{ marginBottom: 16, backgroundColor: "black", padding: 23 }}
       >
         Add Category
       </Button>

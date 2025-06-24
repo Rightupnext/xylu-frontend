@@ -63,6 +63,11 @@ const DashboardLayout = () => {
               icon: <BiSolidStore />,
               label: <Link to="inventory">Inventory"</Link>,
             },
+            {
+              key: "5",
+              icon: <BiSolidStore />,
+              label: <Link to="order-management">New Orders</Link>,
+            },
           ]}
         />
       </Sider>

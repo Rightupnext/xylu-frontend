@@ -20,6 +20,7 @@ import InventoryManager from "./dashboard/InventoryManager";
 import PageNotFound from "./PageNotFound";
 import HeroImageUpload from "./dashboard/HeroImageUpload";
 import OrderHistory from "./client/OrderHistory";
+import OrderManagement from "./dashboard/OrderManagement";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -73,7 +74,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <PrivateRoute allowedRoles={["admin", "super-admin"]}>
+            <PrivateRoute allowedRoles={["admin", "super-admin","employee"]}>
               <Layout />
             </PrivateRoute>
           }
@@ -82,6 +83,7 @@ function App() {
           <Route path="hero" element={<HeroImageUpload />} />
           <Route path="category" element={<CategoryManager />} />
           <Route path="inventory" element={<InventoryManager />} />
+          <Route path="order-management" element={<OrderManagement />} />
         </Route>
 
         {/* 🔓 LOGIN (only when logged out) */}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Select,
@@ -14,18 +14,33 @@ import {
   Steps,
   Form,
   message,
+  Image,
+  Popover,
+  Space,
 } from "antd";
 import {
   SearchOutlined,
   PrinterOutlined,
   ExportOutlined,
 } from "@ant-design/icons";
-
+import {
+  getUserIdByOrder,
+  clientUpdateOrderIssue,
+} from "../store/slice/orderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { token } from "../auth/index";
 const { Title, Text } = Typography;
 const { Option } = Select;
 const { Step } = Steps;
 
 const OrderHistory = () => {
+  const dispatch = useDispatch();
+  const Orders = useSelector((state) => state.order);
+  // console.log("order", Orders);
+  const user = token.getUser();
+  useEffect(() => {
+    dispatch(getUserIdByOrder(user.id));
+  }, [dispatch]);
   const [searchFilters, setSearchFilters] = useState({
     orderId: "",
     email: "",
@@ -36,103 +51,11 @@ const OrderHistory = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showReturnForm, setShowReturnForm] = useState(false);
-
-  const orders = [
-    {
-      id: "ORD-001",
-      date: new Date(2024, 0, 15),
-      customerName: "John Doe",
-      email: "john@example.com",
-      paymentStatus: "Paid",
-      orderStatus: "delivered",
-      products: [
-        {
-          name: "Product 1",
-          code: "PRD-100",
-          size: "M",
-          color: "Black",
-          qty: 2,
-          price: 29.99,
-        },
-        {
-          name: "Product 2",
-          code: "PRD-101",
-          size: "M",
-          color: "Black",
-          qty: 1,
-          price: 49.99,
-        },
-      ],
-      shipping: 5.99,
-      tax: 10.99,
-    },
-    {
-      id: "ORD-002",
-      date: new Date(2024, 1, 10),
-      customerName: "Alice Smith",
-      email: "alice@example.com",
-      paymentStatus: "Unpaid",
-      orderStatus: "pending",
-      products: [
-        {
-          name: "Product A",
-          code: "PRD-102",
-          size: "L",
-          color: "White",
-          qty: 1,
-          price: 59.99,
-        },
-      ],
-      shipping: 4.99,
-      tax: 5.0,
-    },
-    {
-      id: "ORD-003",
-      date: new Date(2024, 2, 5),
-      customerName: "Bob Johnson",
-      email: "bob@example.com",
-      paymentStatus: "Paid",
-      orderStatus: "shipped",
-      products: [
-        {
-          name: "Product B",
-          code: "PRD-103",
-          size: "S",
-          color: "Blue",
-          qty: 3,
-          price: 19.99,
-        },
-      ],
-      shipping: 6.99,
-      tax: 3.5,
-    },
-    {
-      id: "ORD-004",
-      date: new Date(2024, 3, 22),
-      customerName: "Diana Prince",
-      email: "diana@example.com",
-      paymentStatus: "Paid",
-      orderStatus: "order-cancelled",
-      products: [
-        {
-          name: "Product C",
-          code: "PRD-104",
-          size: "XL",
-          color: "Red",
-          qty: 1,
-          price: 89.99,
-        },
-      ],
-      shipping: 0.0,
-      tax: 8.0,
-    },
-  ];
-
   const renderStatusTag = (status) => {
     const colorMap = {
       pending: "blue",
       packed: "purple",
-      shipped: "magenta",
+      shipped: "yellow",
       delivered: "green",
       "order-cancelled": "red",
     };
@@ -153,8 +76,15 @@ const OrderHistory = () => {
   };
 
   const handleReturnSubmit = (values) => {
+    const { issue_type, issue_description } = values;
+    dispatch(
+      clientUpdateOrderIssue({
+        id: selectedOrder.id,
+        issue_type,
+        issue_description,
+      })
+    );
     console.log("Return reason submitted:", values);
-    message.success("Return request submitted");
     setShowReturnForm(false);
   };
 
@@ -166,6 +96,26 @@ const OrderHistory = () => {
       delivered: "#52c41a",
     };
     return colorMap[status.toLowerCase()] || "#d9d9d9";
+  };
+
+  const renderOtpBoxes = (otp) => {
+    if (!otp || typeof otp !== "string") return null;
+
+    const digits = otp.slice(0, 4).split("");
+
+    return (
+      <Space>
+        {digits.map((digit, index) => (
+          <Tag
+            key={index}
+            color="grey"
+            style={{ width: 24, textAlign: "center", padding: "2px 0" }}
+          >
+            {digit}
+          </Tag>
+        ))}
+      </Space>
+    );
   };
 
   return (
@@ -230,46 +180,65 @@ const OrderHistory = () => {
 
       {/* ORDER CARDS */}
       <Row gutter={[16, 16]}>
-        {orders.map((order) => (
-          <Col xs={24} md={12} key={order.id}>
-            <Card
-              title={<Text strong>{order.id}</Text>}
-              extra={renderStatusTag(order.orderStatus)}
-              actions={[
-                <Tooltip title="Print" key="print">
-                  <PrinterOutlined style={{ color: "#faad14" }} />
-                </Tooltip>,
-                <Tooltip title="Export" key="export">
-                  <ExportOutlined style={{ color: "#faad14" }} />
-                </Tooltip>,
-              ]}
-            >
-              <p>
-                {order.date.toLocaleDateString("en-US", {
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
-              <p>
-                <Text strong>Customer:</Text> {order.customerName}
-              </p>
-              <p>
-                <Text strong>Email:</Text> {order.email}
-              </p>
-              <p>
-                <Text strong>Payment:</Text> {order.paymentStatus}
-              </p>
-              <Button
-                type="primary"
-                style={{ backgroundColor: "black" }}
-                onClick={() => handleViewDetails(order)}
-              >
-                View Details
-              </Button>
-            </Card>
-          </Col>
-        ))}
+        {Array.isArray(Orders?.orders) &&
+          [...Orders.orders]
+            .reverse()
+            .filter((pay) => pay.razor_payment === "done")
+            .map((order) => {
+              return (
+                <Col xs={24} md={12} key={order.id}>
+                  <Card
+                    title={<Text strong>{`OrderId # ${order.id}`}</Text>}
+                    extra={
+                      <Space>
+                        {renderStatusTag(order.order_status)}
+                        {renderOtpBoxes(order.otp)}
+                      </Space>
+                    }
+                    actions={[
+                      <Tooltip title="Print" key="print">
+                        <PrinterOutlined style={{ color: "#faad14" }} />
+                      </Tooltip>,
+                      <Tooltip title="Export" key="export">
+                        <ExportOutlined style={{ color: "#faad14" }} />
+                      </Tooltip>,
+                    ]}
+                  >
+                    <Text strong style={{ fontSize: 17 }}>
+                      Delivery Address
+                    </Text>
+
+                    <p>
+                      <Text strong>Order Date:</Text>
+                      {new Date(order?.created_at).toLocaleString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+
+                    <p>
+                      <Text strong>Name:</Text> {order.customer_name}
+                    </p>
+                    <p>
+                      <Text strong>Email:</Text> {order.customer_email}
+                    </p>
+                    <p>
+                      <Text strong>Payment:</Text> Online
+                    </p>
+                    <Button
+                      type="primary"
+                      style={{ backgroundColor: "black" }}
+                      onClick={() => handleViewDetails(order)}
+                    >
+                      View Details
+                    </Button>
+                  </Card>
+                </Col>
+              );
+            })}
       </Row>
 
       {/* MODAL */}
@@ -285,7 +254,7 @@ const OrderHistory = () => {
       >
         {selectedOrder && (
           <>
-            {selectedOrder.orderStatus === "order-cancelled" ? (
+            {selectedOrder.order_status === "order-cancelled" ? (
               <Steps
                 current={0}
                 status="error"
@@ -295,38 +264,125 @@ const OrderHistory = () => {
                 <Step title="Order Cancelled" />
               </Steps>
             ) : (
-              <Steps
-                current={getStatusStep(selectedOrder.orderStatus)}
-                size="small"
-                className="custom-step-line"
-                style={{
-                  marginBottom: 24,
-                  "--line-color": getLineColor(selectedOrder.orderStatus),
-                }}
-              >
-                <Step title="Pending" />
-                <Step title="Packed" />
-                <Step title="Shipped" />
-                <Step title="Delivered" />
-              </Steps>
+              <div>
+                <div className="py-[10px] font-bold">
+                  <Text>Payment Id : {selectedOrder?.razorpay_payment_id}</Text>
+                </div>
+                <Steps
+                  current={getStatusStep(selectedOrder.order_status)}
+                  size="small"
+                  className="custom-step-line"
+                  style={{
+                    marginBottom: 24,
+                    "--line-color": getLineColor(selectedOrder.order_status),
+                  }}
+                >
+                  <Step title="Pending" />
+                  <Step title="Packed" />
+                  <Step title="Shipped" />
+                  <Step title="Delivered" />
+                </Steps>
+              </div>
             )}
 
             <div>
-              {selectedOrder.products.map((product, index) => (
+              {selectedOrder?.cart_items.map((product, index) => (
                 <Card key={index} style={{ marginBottom: 12 }}>
-                  <Row justify="space-between">
-                    <Col>
-                      <Text strong>{product.name}</Text>
-                      <p>Code: {product.code}</p>
-                      <p>Size: {product.size}</p>
-                      <p>Color: {product.color}</p>
-                      <p>Qty: {product.qty}</p>
+                  <Row gutter={[16, 8]} align="middle">
+                    {/* LEFT COLUMN - IMAGE */}
+                    <Col xs={24} sm={8}>
+                      <Image
+                        src={`http://localhost:5005/uploads/${product?.image}`}
+                        alt={product?.product_name}
+                        width="100%"
+                        style={{
+                          // objectFit: "cover",
+                          borderRadius: "8px",
+                          border: "1px solid #eee",
+                          // height: "200px",
+                        }}
+                        preview={false}
+                      />
                     </Col>
-                    <Col style={{ textAlign: "right" }}>
-                      <Text>${product.price.toFixed(2)}</Text>
-                      <p style={{ color: "#aaa" }}>
-                        Total: ${(product.price * product.qty).toFixed(2)}
-                      </p>
+
+                    {/* RIGHT COLUMN - DETAILS */}
+                    <Col xs={24} sm={16} justify="end">
+                      <div className="float-end">
+                        <Text strong style={{ fontSize: 16 }}>
+                          {product?.product_name}
+                        </Text>
+                        <p>Product Code: {product?.product_code}</p>
+
+                        {/* Size */}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginTop: 8,
+                          }}
+                        >
+                          <Text style={{ margin: 0 }}>Size:</Text>
+                          <Button
+                            className={`!w-12 !h-12 !p-0 !rounded-md font-semibold text-sm ${
+                              product.selectedSize
+                                ? "!bg-black !text-white !border-black"
+                                : "!bg-white !text-black !border-gray-300"
+                            }`}
+                          >
+                            {product.selectedSize}
+                          </Button>
+                        </div>
+
+                        {/* Color */}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginTop: 8,
+                          }}
+                        >
+                          <Text style={{ margin: 0 }}>Color:</Text>
+                          <Popover
+                            content={product.selectedColor || "N/A"}
+                            title="Color"
+                            placement="topRight"
+                          >
+                            <Button
+                              style={{
+                                backgroundColor:
+                                  product.selectedColor || "#ccc",
+                                borderRadius: "50%",
+                                width: 40,
+                                height: 40,
+                                border: product.selectedColor
+                                  ? "3px solid pink"
+                                  : "2px solid #ccc",
+                                padding: 0,
+                              }}
+                            >
+                              {product.selectedColor && (
+                                <span
+                                  style={{
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                    fontSize: 16,
+                                  }}
+                                >
+                                  ✓
+                                </span>
+                              )}
+                            </Button>
+                          </Popover>
+                        </div>
+
+                        {/* Quantity */}
+                        <p style={{ marginTop: 8 }}>Qty : {product.quantity}</p>
+                        <p style={{ marginTop: 8 }}>
+                          Price : ₹ {product.price}
+                        </p>
+                      </div>
                     </Col>
                   </Row>
                 </Card>
@@ -337,25 +393,20 @@ const OrderHistory = () => {
 
             <Row justify="end">
               <Col span={12}>
-                <p>
-                  Subtotal: $
-                  {selectedOrder.products
-                    .reduce((sum, p) => sum + p.price * p.qty, 0)
-                    .toFixed(2)}
-                </p>
-                <p>Shipping: ${selectedOrder.shipping.toFixed(2)}</p>
-                <p>Tax: ${selectedOrder.tax.toFixed(2)}</p>
-                <Title level={5}>
-                  Total: $
-                  {(
-                    selectedOrder.products.reduce(
-                      (sum, p) => sum + p.price * p.qty,
-                      0
-                    ) +
-                    selectedOrder.shipping +
-                    selectedOrder.tax
-                  ).toFixed(2)}
-                </Title>
+                <div className="float-end text-right">
+                  <p>
+                    Subtotal: ₹{" "}
+                    {parseFloat(selectedOrder?.subtotal || 0).toFixed(2)}
+                  </p>
+                  <p>
+                    Shipping: ₹{" "}
+                    {parseFloat(selectedOrder?.shipping || 0).toFixed(2)}
+                  </p>
+                  <p>Tax: ₹ {parseFloat(selectedOrder?.tax || 0).toFixed(2)}</p>
+                  <Title level={5}>
+                    Total: ₹ {parseFloat(selectedOrder?.total || 0).toFixed(2)}
+                  </Title>
+                </div>
               </Col>
             </Row>
 
@@ -371,11 +422,12 @@ const OrderHistory = () => {
             ) : (
               <Form
                 layout="vertical"
+                initialValues={selectedOrder}
                 onFinish={handleReturnSubmit}
                 style={{ marginTop: 24 }}
               >
                 <Form.Item
-                  name="reason"
+                  name="issue_type"
                   label="Return Reason"
                   rules={[
                     { required: true, message: "Please select a reason" },
@@ -383,18 +435,23 @@ const OrderHistory = () => {
                 >
                   <Select placeholder="Select reason">
                     <Option value="damaged">Damaged Product</Option>
-                    <Option value="wrong">Wrong Item Received</Option>
-                    <Option value="not_satisfied">Not Satisfied</Option>
+                    <Option value="wrong-item-received">
+                      Wrong Item Received
+                    </Option>
                     <Option value="other">Other</Option>
                   </Select>
                 </Form.Item>
-                <Form.Item name="description" label="Issue Description">
+                <Form.Item name="issue_description" label="Issue Description">
                   <Input.TextArea
                     rows={4}
                     placeholder="Describe the issue..."
                   />
                 </Form.Item>
-                <Button type="primary" htmlType="submit">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  style={{ backgroundColor: "black" }}
+                >
                   Submit Return Request
                 </Button>
               </Form>

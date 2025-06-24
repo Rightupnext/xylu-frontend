@@ -10,16 +10,16 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await axiosInstance.post("/auth/login", credentials);
 
-      if (res.token) {
-        token.set(res.token);
-        localStorage.setItem("xylu-user", JSON.stringify(res.user));
+      if (res.data.token) {
+        token.set(res.data.token);
+        localStorage.setItem("xylu-user", JSON.stringify(res.data.user));
         notification.success({
           message: "Login Successful",
-          description: `Welcome, ${res.user?.username || "User"}`,
+          description: `Welcome, ${res.data.user?.username || "User"}`,
         });
       }
 
-      return res;
+      return res.data; // Return the actual data here
     } catch (err) {
       notification.error({
         message: "Login Failed",

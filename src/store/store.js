@@ -4,6 +4,7 @@ import authReducer from "./slice/authSlice";
 import categoryReducer from "./slice/categorySlice";
 import ProductReducer from "./slice/productSlice";
 import heroReducers from "./slice/heroSlice";
+import orderReducers from './slice/orderSlice'
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     category: categoryReducer,
     product: ProductReducer,
     hero: heroReducers,
+    order:orderReducers,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

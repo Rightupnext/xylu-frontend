@@ -12,6 +12,7 @@ import {
   Col,
   Tag,
   Popconfirm,
+  Checkbox,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -133,6 +134,7 @@ const InventoryManager = () => {
     formData.append("description", values.description || "");
     formData.append("price", values.price);
     formData.append("discount", values.discount || 0);
+    formData.append("Bulk_discount", values.Bulk_discount ? 1 : 0);
     formData.append("trend", values.trend || "regular");
 
     if (selectedFile) {
@@ -369,6 +371,21 @@ const InventoryManager = () => {
                   <Select.Option value="bestseller">Bestseller</Select.Option>
                   <Select.Option value="regular">Regular</Select.Option>
                 </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="Bulk_discount"
+                valuePropName="checked"
+                label="Bulk Discount"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginLeft: 145,
+                }}
+              >
+                <Checkbox style={{ transform: "scale(2.5)" }} />
               </Form.Item>
             </Col>
           </Row>

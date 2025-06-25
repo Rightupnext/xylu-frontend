@@ -22,16 +22,17 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCartThunk } from "../store/slice/CartSlice";
 import { getProductById } from "../store/slice/productSlice";
+import GiftBox from "./GiftBox";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-const ProductDetail = () => {
+const ProductOfferDetailsPage = () => {
   const dispatch = useDispatch();
   const { selectedProduct } = useSelector((state) => state.product);
   const originalPrice = selectedProduct?.price ?? 0;
 
   const discountPercentage =
-    selectedProduct?.Bulk_discount === 0
+    selectedProduct?.Bulk_discount === 1
       ? parseFloat(selectedProduct?.discount) || 0
       : 0;
 
@@ -39,7 +40,7 @@ const ProductDetail = () => {
   const discountedPrice = originalPrice - discountAmount;
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -89,9 +90,11 @@ const ProductDetail = () => {
         selectedColor,
         selectedSize,
         quantity,
+        originalPrice,
         discountedPrice,
       })
     );
+    console.log("discountedPrice", discountedPrice);
   };
 
   const getAvailableColors = () => {
@@ -136,6 +139,49 @@ const ProductDetail = () => {
       },
     },
   ];
+  const formatTime = (value) => String(value).padStart(2, "0");
+  const [timeLeft, setTimeLeft] = useState({
+    days: 1,
+    hours: 24,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        const { days, hours, minutes, seconds } = prev;
+
+        if (seconds > 0) {
+          return { ...prev, seconds: seconds - 1 };
+        } else if (minutes > 0) {
+          return { ...prev, minutes: minutes - 1, seconds: 59 };
+        } else if (hours > 0) {
+          return { ...prev, hours: hours - 1, minutes: 59, seconds: 59 };
+        } else if (days > 0) {
+          return {
+            days: days - 1,
+            hours: 23,
+            minutes: 59,
+            seconds: 59,
+          };
+        } else {
+          // Countdown finished
+          clearInterval(timer);
+          return prev;
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsModalOpen(true);
+    }, 500); // Delay before showing modal
+
+    return () => clearTimeout(timer);
+  }, []);
 
   if (loading || !selectedProduct) {
     return (
@@ -154,7 +200,7 @@ const ProductDetail = () => {
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto p-6 mt-[170px]">
+      <div className="max-w-screen-xl mx-auto p-6 mt-[170px] relative">
         <Row gutter={[32, 32]} align="top">
           <Col xs={24} md={12}>
             <motion.div
@@ -287,6 +333,35 @@ const ProductDetail = () => {
                 <Button size="small" onClick={() => handleQuantityChange(1)}>
                   +
                 </Button>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-semibold text-gray-800">Offer Ends In:</h3>
+                <div className="flex gap-4">
+                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
+                    <span className="text-2xl font-bold text-gray-800">
+                      {formatTime(timeLeft.days)}
+                    </span>
+                    <p className="text-sm text-gray-500">Day's</p>
+                  </div>
+                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
+                    <span className="text-2xl font-bold text-gray-800">
+                      {formatTime(timeLeft.hours)}
+                    </span>
+                    <p className="text-sm text-gray-500">Hours</p>
+                  </div>
+                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
+                    <span className="text-2xl font-bold text-gray-800">
+                      {formatTime(timeLeft.minutes)}
+                    </span>
+                    <p className="text-sm text-gray-500">Minutes</p>
+                  </div>
+                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
+                    <span className="text-2xl font-bold text-gray-800">
+                      {formatTime(timeLeft.seconds)}
+                    </span>
+                    <p className="text-sm text-gray-500">Seconds</p>
+                  </div>
+                </div>
               </div>
               <Divider />
               <Paragraph>{selectedProduct?.description}</Paragraph>
@@ -441,8 +516,26 @@ const ProductDetail = () => {
         )}
       </div>
       <NewArrivals />
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-60">
+          <div className="relative w-full max-w-3xl h-[80vh] bg-transparent">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 z-50 cursor-pointer bg-red-500 text-white text-4xl  rounded-full w-10 h-10 flex items-center justify-center hover:bg-black"
+            >
+              &times;
+            </button>
+
+            {/* Modal Content */}
+            <div className="w-full h-full relative z-40">
+              <GiftBox timeLeft={timeLeft} />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
 
-export default ProductDetail;
+export default ProductOfferDetailsPage;

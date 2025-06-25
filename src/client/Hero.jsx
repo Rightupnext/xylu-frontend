@@ -1,6 +1,6 @@
 import { Carousel, Modal } from "antd";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import WelcomPage from "./WelcomPage";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHeroes } from "../store/slice/heroSlice";
@@ -9,7 +9,7 @@ export default function Hero() {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   const { heroImages, loading } = useSelector((state) => state.hero);
   useEffect(() => {
     dispatch(fetchHeroes());
@@ -65,6 +65,7 @@ export default function Hero() {
               <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
                 <button
                   type="button"
+                  onClick={() => navigate(`${slide.url}`)}
                   style={{ color: "white" }}
                   className="w-[220px] rounded-3xl cursor-pointer h-[60px] bg-[#c97a9f] hover:bg-[#a44c6c] focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-sm px-5 py-2.5 me-2 mb-2"
                 >

@@ -44,7 +44,7 @@ export default function AddToCartAntd() {
   };
 
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.discountedPrice * item.quantity,
     0
   );
   const shipping = 2;

@@ -37,6 +37,28 @@ export const uploadHeroImage = createAsyncThunk(
     }
   }
 );
+export const updateHeroImage = createAsyncThunk(
+  "hero/updateHeroImage",
+  async ({ id, formData }, { rejectWithValue, dispatch }) => {
+    try {
+      // Use PUT (or PATCH if your backend prefers)
+      const res = await axiosInstance.put(`/hero/update-hero/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      notification.success({ message: "Hero image updated successfully" });
+      dispatch(fetchHeroes()); // Refresh after update
+      return res.data;
+    } catch (err) {
+      notification.error({
+        message: "Update failed",
+        description: err?.response?.data?.message || "Failed to update image",
+      });
+      return rejectWithValue(err?.response?.data || err);
+    }
+  }
+);
 
 // 3. Delete a hero image
 export const deleteHeroImage = createAsyncThunk(
@@ -100,6 +122,17 @@ const heroSlice = createSlice({
       .addCase(deleteHeroImage.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to delete hero image";
+      })
+      .addCase(updateHeroImage.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateHeroImage.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateHeroImage.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update hero image";
       });
   },
 });

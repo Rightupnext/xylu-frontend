@@ -6,6 +6,7 @@ import Footer from "./client/Footer";
 import Collection from "./client/Collection";
 import ContactPage from "./client/ContactUs";
 import ProductDetail from "./client/ProductDetailsPage";
+import ProductOfferDetailsPage from "./client/ProductOfferDetailsPage";
 import FaqSection from "./client/FaqSection";
 import Login from "./client/Login";
 import AddToCart from "./client/AddToCart";
@@ -46,6 +47,14 @@ function App() {
           }
         />
         <Route
+          path="/offers/:collections/:id"
+          element={
+            // <PrivateRoute>
+            <ProductOfferDetailsPage />
+            // </PrivateRoute>
+          }
+        />
+        <Route
           path="/faq"
           element={
             // <PrivateRoute>
@@ -74,7 +83,7 @@ function App() {
         <Route
           path="/admin"
           element={
-            <PrivateRoute allowedRoles={["admin", "super-admin","employee"]}>
+            <PrivateRoute allowedRoles={["admin", "super-admin", "employee"]}>
               <Layout />
             </PrivateRoute>
           }

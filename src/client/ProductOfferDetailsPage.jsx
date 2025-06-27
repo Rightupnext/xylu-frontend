@@ -27,12 +27,15 @@ import { getProductById } from "../store/slice/productSlice";
 import GiftBox from "./GiftBox";
 import Offerimg from "../assets/gift/offer.png";
 import soldout from "../assets/gift/soldout.png";
+import Review from "./Review";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 const ProductOfferDetailsPage = () => {
   const dispatch = useDispatch();
+  const { id } = useParams();
   const { selectedProduct } = useSelector((state) => state.product);
+  const { reviews } = useSelector((state) => state.review);
   const originalPrice = selectedProduct?.price ?? 0;
   const [visible, setVisible] = useState(false);
   const discountPercentage =
@@ -45,13 +48,12 @@ const ProductOfferDetailsPage = () => {
   }, []);
   const discountAmount = (originalPrice * discountPercentage) / 100;
   const discountedPrice = Math.round(originalPrice - discountAmount);
-  const { id } = useParams();
+
   const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [showForm, setShowForm] = useState(false);
   useEffect(() => {
     setLoading(true);
     dispatch(getProductById(id)).finally(() => setLoading(false));
@@ -74,7 +76,6 @@ const ProductOfferDetailsPage = () => {
     }
   }, [selectedProduct]);
 
-  const toggleForm = () => setShowForm((prev) => !prev);
   const handleQuantityChange = (delta) => {
     const newQty = Math.max(1, quantity + delta);
     setQuantity(newQty);
@@ -101,7 +102,7 @@ const ProductOfferDetailsPage = () => {
         discountedPrice,
       })
     );
-    console.log("discountedPrice", discountedPrice);
+    // console.log("discountedPrice", discountedPrice);
   };
 
   const getAvailableColors = () => {
@@ -116,36 +117,6 @@ const ProductOfferDetailsPage = () => {
       .flatMap((v) => v.size);
   };
 
-  const reviews = [
-    {
-      name: "ElizabethR Bklyn",
-      verified: true,
-      rating: 5,
-      date: "14 days ago",
-      title: "Warm and very attractive on",
-      body: "Got this to keep my husband warm on those chilly late fall days...",
-      profile: {
-        height: "5’10”",
-        weight: "170 – 180 lbs",
-        type: "Fit",
-        size: "L",
-      },
-    },
-    {
-      name: "Anonymous",
-      verified: true,
-      rating: 5,
-      date: "14 days ago",
-      title: "Super comfy",
-      body: "Great quality, warm and super comfy...",
-      profile: {
-        height: "6’1”",
-        weight: "180 – 190 lbs",
-        type: "Fit",
-        size: "L",
-      },
-    },
-  ];
   const expiryParts = selectedProduct?.offerExpiry?.split(",");
   const offerEndDate = expiryParts?.[1] ? new Date(expiryParts[1]) : null;
   const calculateTimeLeft = (endDate) => {
@@ -510,103 +481,7 @@ const ProductOfferDetailsPage = () => {
           </Col>
         </Row>
       </div>
-      <div className="max-w-7xl mx-auto p-6">
-        <Title level={4}>5.0 Overall Rating</Title>
-        <Rate allowHalf disabled defaultValue={5} />
-        <Row gutter={16} className="mt-4 mb-6">
-          <Col span={12}>
-            {[5, 4, 3, 2, 1].map((star) => (
-              <Row key={star} align="middle" className="mb-1">
-                <Col span={4}>{star} star</Col>
-                <Col span={20}>
-                  <Progress
-                    percent={star === 5 ? 100 : 0}
-                    showInfo={false}
-                    strokeColor="gray"
-                  />
-                </Col>
-              </Row>
-            ))}
-          </Col>
-          <Col span={12}>
-            <Text strong>Runs slightly large</Text>
-            <div className="flex gap-2 items-center mt-1">
-              <Text>Runs small</Text>
-              <Progress
-                percent={70}
-                showInfo={false}
-                size="small"
-                strokeColor="#999"
-              />
-              <Text>Runs large</Text>
-            </div>
-          </Col>
-        </Row>
-
-        <Divider />
-
-        {reviews.map((review, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            className="mb-6"
-          >
-            <Text strong>{review.name}</Text>{" "}
-            {review.verified && <Text type="secondary">✔ Verified</Text>}
-            <div className="flex items-center">
-              <Rate disabled defaultValue={review.rating} />
-              <Text type="secondary" className="ml-2">
-                {review.date}
-              </Text>
-            </div>
-            <Paragraph strong>{review.title}</Paragraph>
-            <Paragraph>{review.body}</Paragraph>
-            <Text type="secondary">
-              Height: {review.profile.height} | Weight: {review.profile.weight}{" "}
-              | Body Type: {review.profile.type} | Size Purchased:{" "}
-              {review.profile.size}
-            </Text>
-          </motion.div>
-        ))}
-
-        <Divider />
-
-        <div className="text-center mb-4">
-          <Button type="primary" onClick={toggleForm}>
-            {showForm ? "Close Review Form" : "Write a Review"}
-          </Button>
-        </div>
-
-        {showForm && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gray-100 p-4 rounded"
-          >
-            <Form layout="vertical">
-              <Form.Item label="Name">
-                <Input placeholder="Enter your name" />
-              </Form.Item>
-              <Form.Item label="Rating">
-                <Rate />
-              </Form.Item>
-              <Form.Item label="Title">
-                <Input placeholder="Review title" />
-              </Form.Item>
-              <Form.Item label="Review">
-                <TextArea rows={4} placeholder="Write your review..." />
-              </Form.Item>
-              <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Submit Review
-                </Button>
-              </Form.Item>
-            </Form>
-          </motion.div>
-        )}
-      </div>
+      <Review reviews={reviews} id={id} />
       <NewArrivals />
 
       {!isCountdownOver && isModalOpen && (

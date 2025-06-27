@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Row,
   Col,
@@ -7,8 +7,10 @@ import {
   Progress,
   Button,
   Statistic,
-  Avatar,
   Divider,
+  DatePicker,
+  Empty,
+  message,
 } from "antd";
 import { ArrowUpOutlined, ArrowDownOutlined } from "@ant-design/icons";
 import {
@@ -22,215 +24,237 @@ import {
   LineChart,
   Line,
 } from "recharts";
-
+import { useSelector, useDispatch } from "react-redux";
+import { getOrderAnyltics } from "../store/slice/orderSlice";
+import dayjs from "dayjs";
+import { token } from "../auth";
 const { Title, Text } = Typography;
-
-const barData = [
-  { month: "Jan", 2024: 12, 2023: 5 },
-  { month: "Feb", 2024: 5, 2023: 2 },
-  { month: "Mar", 2024: 15, 2023: 8 },
-  { month: "Apr", 2024: 25, 2023: 12 },
-  { month: "May", 2024: 18, 2023: 9 },
-  { month: "Jun", 2024: 10, 2023: 5 },
-];
-
-const lineData = [
-  { month: "Jan", profit: 20 },
-  { month: "Feb", profit: 40 },
-  { month: "Mar", profit: 30 },
-  { month: "Apr", profit: 70 },
-  { month: "May", profit: 45 },
-  { month: "Jun", profit: 60 },
-];
-
-const transactions = [
-  { name: "Paypal", type: "Send money", amount: "+$82.6", color: "#FFB6C1" },
-  { name: "Wallet", type: "Mac'D", amount: "+$270.69", color: "#87CEFA" },
-  { name: "Transfer", type: "Refund", amount: "+$637.91", color: "#98FB98" },
-  {
-    name: "Credit Card",
-    type: "Ordered Food",
-    amount: "-$838.71",
-    color: "#FFD700",
-  },
-  { name: "Wallet", type: "Starbucks", amount: "+$203.33", color: "#40E0D0" },
-  {
-    name: "Mastercard",
-    type: "Ordered Food",
-    amount: "-$129.20",
-    color: "#FF69B4",
-  },
-];
+const { RangePicker } = DatePicker;
 
 const HomeDashboard = () => {
+  const dispatch = useDispatch();
+  const [dateRange, setDateRange] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const user = token.getUser();
+  console.log("user", user);
+  const {
+    orderAnyltics: {
+      pending = {},
+      packed = {},
+      shipped = {},
+      delivered = {},
+      "order-cancelled": orderCancelled = {},
+      totalOrders = 0,
+      totalRevenue = 0,
+      paymentHistory = [],
+    } = {},
+    error,
+  } = useSelector((state) => state.order);
+
+  useEffect(() => {
+    try {
+      if (dateRange.length === 2) {
+        const [start, end] = dateRange;
+
+        if (!start || !end || end.isBefore(start)) {
+          message.warning("Invalid date range selected");
+          return;
+        }
+
+        dispatch(
+          getOrderAnyltics({
+            startDate: start.format("YYYY-MM-DD"),
+            endDate: end.format("YYYY-MM-DD"),
+          })
+        );
+      } else {
+        dispatch(getOrderAnyltics());
+      }
+    } catch (err) {
+      console.error("Error dispatching analytics:", err);
+      setErrorMsg("Failed to load analytics");
+    }
+  }, [dispatch, dateRange]);
+
+  const chartData = paymentHistory?.length
+    ? paymentHistory
+        .map((entry) => ({
+          date: new Date(entry.date).toLocaleDateString("en-IN"),
+          amount: entry.totalAmount,
+        }))
+        .slice()
+        .reverse()
+    : [];
+
+  const lineData = paymentHistory?.length
+    ? paymentHistory
+        .map((entry) => ({
+          date: new Date(entry.date).toLocaleDateString("en-IN"),
+          profit: entry.totalAmount,
+        }))
+        .slice()
+        .reverse()
+    : [];
+
   return (
     <div style={{ padding: 24 }}>
-      <Row gutter={[16, 6]}>
-        {/* Greeting */}
+      <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card>
-            <Title level={4}>🎉 Congratulations John!</Title>
-            <Text>
-              You have done <b>72%</b> more sales today. Check your new badge.
-            </Text>
-            <div style={{ marginTop: 10 }}>
-              <Button type="primary" style={{backgroundColor:"#c97a9f"}}>View Badges</Button>
-            </div>
-          </Card>
-        </Col>
-
-        {/* Stats Cards */}
-        <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Profit"
-              value={12628}
-              prefix="$"
-              valueStyle={{ color: "#3f8600" }}
-              suffix={<ArrowUpOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Sales"
-              value={4679}
-              prefix="$"
-              valueStyle={{ color: "#3f8600" }}
-              suffix={<ArrowUpOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Payments"
-              value={2468}
-              prefix="$"
-              valueStyle={{ color: "#cf1322" }}
-              suffix={<ArrowDownOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} md={6}>
-          <Card>
-            <Statistic
-              title="Transactions"
-              value={14857}
-              prefix="$"
-              valueStyle={{ color: "#3f8600" }}
-              suffix={<ArrowUpOutlined />}
-            />
-          </Card>
-        </Col>
-
-        {/* Charts */}
-        <Col xs={24} lg={16}>
-          <Card title="Total Revenue">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="2024" fill="#c97a9f" />
-                <Bar dataKey="2023" fill="#000000" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Col>
-
-        <Col xs={24} lg={8}>
-          <Card title="Company Growth">
-            <div style={{ textAlign: "center" }}>
-              <Progress type="dashboard" percent={78} />
-              <Text>62% Company Growth</Text>
-              <div style={{ marginTop: 16 }}>
+            <Row justify="space-between" align="middle">
+              <Col>
+                <Title level={4}>🎉 Congratulations {user?.username}!</Title>
                 <Text>
-                  2023: <b>$32.5k</b>
+                  You have done{" "}
+                  <b>
+                    {Math.round((delivered.count / totalOrders) * 100 || 0)}%
+                  </b>{" "}
+                  more Delivered. Check your new badge.
                 </Text>
-                <br />
-                <Text>
-                  2022: <b>$41.2k</b>
-                </Text>
-              </div>
-            </div>
-          </Card>
-        </Col>
-
-        {/* Order Statistics */}
-        <Col xs={24} md={12}>
-          <Card title="Order Statistics">
-            <Statistic value={8258} title="Total Orders" />
-            <Progress
-              type="circle"
-              percent={38}
-              format={(percent) => `${percent}% Weekly`}
-            />
-            <Divider />
-            <ul style={{ paddingLeft: 16 }}>
-              <li>📱 Electronic: 82.5k</li>
-              <li>👕 Fashion: 23.8k</li>
-              <li>🎨 Decor: 849</li>
-              <li>⚽ Sports: 99</li>
-            </ul>
-          </Card>
-        </Col>
-
-        {/* Profit Line Chart */}
-        <Col xs={24} md={12}>
-          <Card title="Total Profit">
-            <Statistic
-              value={147900}
-              prefix="$"
-              valueStyle={{ color: "#3f8600" }}
-            />
-            <Text>+35.1% compared to last week</Text>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={lineData}>
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="profit"
-                  stroke="#8884d8"
-                  strokeWidth={2}
+              </Col>
+              <Col>
+                <RangePicker
+                  onChange={setDateRange}
+                  allowEmpty={[false, false]}
                 />
-              </LineChart>
-            </ResponsiveContainer>
+                <Button onClick={() => setDateRange([])} type="primary">
+                  Reset
+                </Button>
+              </Col>
+            </Row>
           </Card>
         </Col>
 
-        {/* Transactions */}
-        <Col span={24}>
-          <Card
-            title="Recent Transactions"
-            extra={<Button type="primary">Upgrade to Pro</Button>}
-          >
-            {transactions.map((item, index) => (
-              <Row
-                key={index}
-                justify="space-between"
-                align="middle"
-                style={{ marginBottom: 12 }}
-              >
-                <Col>
-                  <Avatar style={{ backgroundColor: item.color }}>
-                    {item.name[0]}
-                  </Avatar>
-                  <Text style={{ marginLeft: 12 }}>
-                    {item.name} - {item.type}
-                  </Text>
-                </Col>
-                <Col>
-                  <Text strong>{item.amount}</Text>
-                </Col>
-              </Row>
+        {error || errorMsg ? (
+          <Col span={24}>
+            <Card>
+              <Empty
+                description={errorMsg || "No data found for selected range"}
+              />
+            </Card>
+          </Col>
+        ) : (
+          <>
+            {[
+              /* Stats cards */ {
+                title: `Total Revenue (${totalOrders} Orders)`,
+                value: totalRevenue,
+                color: "#3f8600",
+                suffix: <ArrowUpOutlined />,
+              },
+              {
+                title: `Delivered (${delivered.count || 0})`,
+                value: delivered.totalAmount || 0,
+                color: "#3f8600",
+                suffix: <ArrowUpOutlined />,
+              },
+              {
+                title: `Shipped (${shipped.count || 0})`,
+                value: shipped.totalAmount || 0,
+                color: "#cf1322",
+                suffix: <ArrowDownOutlined />,
+              },
+              {
+                title: `Packed (${packed.count || 0})`,
+                value: packed.totalAmount || 0,
+                color: "#3f8600",
+                suffix: <ArrowUpOutlined />,
+              },
+              {
+                title: `Pending (${pending.count || 0})`,
+                value: pending.totalAmount || 0,
+                color: "#d48806",
+                suffix: <ArrowUpOutlined />,
+              },
+              {
+                title: `Cancelled (${orderCancelled.count || 0})`,
+                value: orderCancelled.totalAmount || 0,
+                color: "#cf1322",
+                suffix: <ArrowDownOutlined />,
+              },
+            ].map((item, index) => (
+              <Col key={index} xs={24} sm={12} md={8} lg={6}>
+                <Card>
+                  <Statistic
+                    title={item.title}
+                    value={(item.value ?? 0).toFixed(2)}
+                    prefix="₹"
+                    valueStyle={{ color: item.color }}
+                    suffix={item.suffix}
+                  />
+                </Card>
+              </Col>
             ))}
-          </Card>
-        </Col>
+
+            <Col xs={24} lg={16}>
+              <Card title="Revenue by Date">
+                {chartData.length ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="amount" fill="#c97a9f" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Empty description="No chart data" />
+                )}
+              </Card>
+            </Col>
+
+            <Col xs={24} lg={8}>
+              <Card title="Order Statistics">
+                <Statistic value={totalOrders} title="Total Orders" />
+                <Progress
+                  type="circle"
+                  percent={Math.round(
+                    (delivered.count / totalOrders) * 100 || 0
+                  )}
+                  format={(percent) => `${percent}% Delivered`}
+                  style={{ margin: "16px auto", display: "block" }}
+                />
+                <Divider />
+                <ul style={{ paddingLeft: 16 }}>
+                  <li>🕐 Pending: {pending.count}</li>
+                  <li>📦 Packed: {packed.count}</li>
+                  <li>🚚 Shipped: {shipped.count}</li>
+                  <li>✅ Delivered: {delivered.count}</li>
+                  <li>❌ Cancelled: {orderCancelled.count}</li>
+                </ul>
+              </Card>
+            </Col>
+
+            <Col xs={24}>
+              <Card title="Total Profit (By Date)">
+                <Statistic
+                  value={(totalRevenue ?? 0).toFixed(2)}
+                  prefix="₹"
+                  valueStyle={{ color: "#3f8600" }}
+                />
+                <Text>+35.1% compared to last week</Text>
+                {lineData.length ? (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart data={lineData}>
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line
+                        type="linear"
+                        dataKey="profit"
+                        stroke="#8884d8"
+                        strokeWidth={3}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <Empty description="No line chart data" />
+                )}
+              </Card>
+            </Col>
+          </>
+        )}
       </Row>
     </div>
   );

@@ -12,6 +12,8 @@ import {
   Form,
   Skeleton,
   InputNumber,
+  Card,
+  Image,
 } from "antd";
 import { motion } from "framer-motion";
 import NewArrivals from "./NewArrivals";
@@ -23,6 +25,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCartThunk } from "../store/slice/CartSlice";
 import { getProductById } from "../store/slice/productSlice";
 import GiftBox from "./GiftBox";
+import Offerimg from "../assets/gift/offer.png";
+import soldout from "../assets/gift/soldout.png";
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
@@ -30,14 +34,17 @@ const ProductOfferDetailsPage = () => {
   const dispatch = useDispatch();
   const { selectedProduct } = useSelector((state) => state.product);
   const originalPrice = selectedProduct?.price ?? 0;
-
+  const [visible, setVisible] = useState(false);
   const discountPercentage =
     selectedProduct?.Bulk_discount === 1
       ? parseFloat(selectedProduct?.discount) || 0
       : 0;
-
+  useEffect(() => {
+    // Automatically open preview after mount
+    setVisible(true);
+  }, []);
   const discountAmount = (originalPrice * discountPercentage) / 100;
-  const discountedPrice = originalPrice - discountAmount;
+  const discountedPrice = Math.round(originalPrice - discountAmount);
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -139,42 +146,50 @@ const ProductOfferDetailsPage = () => {
       },
     },
   ];
+  const expiryParts = selectedProduct?.offerExpiry?.split(",");
+  const offerEndDate = expiryParts?.[1] ? new Date(expiryParts[1]) : null;
+  const calculateTimeLeft = (endDate) => {
+    const difference = endDate - new Date();
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((difference / 1000 / 60) % 60);
+    const seconds = Math.floor((difference / 1000) % 60);
+
+    return { days, hours, minutes, seconds };
+  };
+
   const formatTime = (value) => String(value).padStart(2, "0");
-  const [timeLeft, setTimeLeft] = useState({
-    days: 1,
-    hours: 24,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeLeft, setTimeLeft] = useState(
+    offerEndDate
+      ? calculateTimeLeft(offerEndDate)
+      : { days: 0, hours: 0, minutes: 0, seconds: 0 }
+  );
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        const { days, hours, minutes, seconds } = prev;
+    if (!offerEndDate) return;
 
-        if (seconds > 0) {
-          return { ...prev, seconds: seconds - 1 };
-        } else if (minutes > 0) {
-          return { ...prev, minutes: minutes - 1, seconds: 59 };
-        } else if (hours > 0) {
-          return { ...prev, hours: hours - 1, minutes: 59, seconds: 59 };
-        } else if (days > 0) {
-          return {
-            days: days - 1,
-            hours: 23,
-            minutes: 59,
-            seconds: 59,
-          };
-        } else {
-          // Countdown finished
-          clearInterval(timer);
-          return prev;
-        }
-      });
+    const timer = setInterval(() => {
+      const newTimeLeft = calculateTimeLeft(offerEndDate);
+
+      setTimeLeft(newTimeLeft);
+
+      if (
+        newTimeLeft.days === 0 &&
+        newTimeLeft.hours === 0 &&
+        newTimeLeft.minutes === 0 &&
+        newTimeLeft.seconds === 0
+      ) {
+        clearInterval(timer);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [offerEndDate]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsModalOpen(true);
@@ -197,10 +212,20 @@ const ProductOfferDetailsPage = () => {
       </div>
     );
   }
-
+  const isCountdownOver =
+    timeLeft.days === 0 &&
+    timeLeft.hours === 0 &&
+    timeLeft.minutes === 0 &&
+    timeLeft.seconds === 0;
   return (
     <>
       <div className="max-w-screen-xl mx-auto p-6 mt-[170px] relative">
+        {isCountdownOver && (
+          <img
+            src={soldout}
+            className="bg-gary-500 absolute z-[40] w-3/4 opacity-50 mt-[230px] mx-auto"
+          />
+        )}
         <Row gutter={[32, 32]} align="top">
           <Col xs={24} md={12}>
             <motion.div
@@ -214,6 +239,7 @@ const ProductOfferDetailsPage = () => {
                 className="w-full rounded shadow"
               />
             </motion.div>
+
             {selectedProduct?.discount > 0 && (
               <motion.div
                 className="absolute top-4 left-4 bg-[#FF4C4C] text-white px-4 py-2 rounded-full font-extrabold"
@@ -227,6 +253,14 @@ const ProductOfferDetailsPage = () => {
           </Col>
 
           <Col xs={24} md={12}>
+            {!isCountdownOver && (
+              <div className="hidden md:block absolute z-[40] w-[200px] md:w-[300px] right-0 ">
+                <Image src={Offerimg} preview={false} />
+                <span className="text-red-700 absolute font-extrabold text-2xl right-[121px] bottom-[24px]">
+                  {selectedProduct?.discount}
+                </span>
+              </div>
+            )}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -335,33 +369,71 @@ const ProductOfferDetailsPage = () => {
                 </Button>
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-gray-800">Offer Ends In:</h3>
-                <div className="flex gap-4">
-                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
-                    <span className="text-2xl font-bold text-gray-800">
-                      {formatTime(timeLeft.days)}
-                    </span>
-                    <p className="text-sm text-gray-500">Day's</p>
-                  </div>
-                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
-                    <span className="text-2xl font-bold text-gray-800">
-                      {formatTime(timeLeft.hours)}
-                    </span>
-                    <p className="text-sm text-gray-500">Hours</p>
-                  </div>
-                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
-                    <span className="text-2xl font-bold text-gray-800">
-                      {formatTime(timeLeft.minutes)}
-                    </span>
-                    <p className="text-sm text-gray-500">Minutes</p>
-                  </div>
-                  <div className="bg-gray-100 px-4 py-2 rounded-lg text-center">
-                    <span className="text-2xl font-bold text-gray-800">
-                      {formatTime(timeLeft.seconds)}
-                    </span>
-                    <p className="text-sm text-gray-500">Seconds</p>
-                  </div>
-                </div>
+                <Title level={4} style={{ color: "#1f2937" }}>
+                  Offer Ends In:
+                </Title>
+
+                <Row gutter={[16, 16]} justify="start">
+                  <Col xs={12} sm={6}>
+                    <Card
+                      bordered={false}
+                      style={{
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      <Title level={3} style={{ margin: 0, color: "#1f2937" }}>
+                        {formatTime(timeLeft.days)}
+                      </Title>
+                      <Text type="secondary">Days</Text>
+                    </Card>
+                  </Col>
+
+                  <Col xs={12} sm={6}>
+                    <Card
+                      bordered={false}
+                      style={{
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      <Title level={3} style={{ margin: 0, color: "#1f2937" }}>
+                        {formatTime(timeLeft.hours)}
+                      </Title>
+                      <Text type="secondary">Hours</Text>
+                    </Card>
+                  </Col>
+
+                  <Col xs={12} sm={6}>
+                    <Card
+                      bordered={false}
+                      style={{
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      <Title level={3} style={{ margin: 0, color: "#1f2937" }}>
+                        {formatTime(timeLeft.minutes)}
+                      </Title>
+                      <Text type="secondary">Minutes</Text>
+                    </Card>
+                  </Col>
+
+                  <Col xs={12} sm={6}>
+                    <Card
+                      bordered={false}
+                      style={{
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      <Title level={3} style={{ margin: 0, color: "#1f2937" }}>
+                        {formatTime(timeLeft.seconds)}
+                      </Title>
+                      <Text type="secondary">Seconds</Text>
+                    </Card>
+                  </Col>
+                </Row>
               </div>
               <Divider />
               <Paragraph>{selectedProduct?.description}</Paragraph>
@@ -372,10 +444,30 @@ const ProductOfferDetailsPage = () => {
                 block
                 size="large"
                 onClick={handleAddToCart}
-                disabled={loading}
-                style={{ backgroundColor: "#4a1f2e", border: "none" }}
+                disabled={
+                  loading ||
+                  (timeLeft.days === 0 &&
+                    timeLeft.hours === 0 &&
+                    timeLeft.minutes === 0 &&
+                    timeLeft.seconds === 0)
+                }
+                style={{
+                  backgroundColor:
+                    timeLeft.days === 0 &&
+                    timeLeft.hours === 0 &&
+                    timeLeft.minutes === 0 &&
+                    timeLeft.seconds === 0
+                      ? "#ccc" // Gray when expired
+                      : "#4a1f2e", // Default color
+                  border: "none",
+                }}
               >
-                ADD TO BAG
+                {timeLeft.days === 0 &&
+                timeLeft.hours === 0 &&
+                timeLeft.minutes === 0 &&
+                timeLeft.seconds === 0
+                  ? "Offer Expired"
+                  : "ADD TO BAG"}
               </Button>
 
               <div className="mt-4 mb-3">
@@ -516,19 +608,20 @@ const ProductOfferDetailsPage = () => {
         )}
       </div>
       <NewArrivals />
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-60">
-          <div className="relative w-full max-w-3xl h-[80vh] bg-transparent">
+
+      {!isCountdownOver && isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="relative w-full max-w-3xl h-[80vh] bg-transparent flex items-center justify-center">
             {/* Close Button */}
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 z-50 cursor-pointer bg-red-500 text-white text-4xl  rounded-full w-10 h-10 flex items-center justify-center hover:bg-black"
+              className="absolute top-4 right-4 z-50 cursor-pointer bg-red-500 text-white text-4xl rounded-full w-10 h-10 flex items-center justify-center hover:bg-black"
             >
               &times;
             </button>
 
-            {/* Modal Content */}
-            <div className="w-full h-full relative z-40">
+            {/* Centered Modal Content */}
+            <div className="w-full h-full flex items-center justify-center">
               <GiftBox timeLeft={timeLeft} />
             </div>
           </div>

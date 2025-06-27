@@ -141,10 +141,21 @@ export const clientUpdateOrderIssue = createAsyncThunk(
     }
   }
 );
+export const getOrderAnyltics = createAsyncThunk(
+  "order/getOrderAnyltics",
+  async ({ startDate, endDate } = {}) => {
+    const response = await axiosInstance.get(`/order/order-analytics`, {
+      params: startDate && endDate ? { startDate, endDate } : {},
+    });
+
+    return response.data;
+  }
+);
 
 const orderSlice = createSlice({
   name: "order",
   initialState: {
+    orderAnyltics: [],
     orders: [],
     userId: null,
     loading: false,
@@ -182,8 +193,8 @@ const orderSlice = createSlice({
 
       .addCase(adminUpdateOrder.fulfilled, (state, action) => {
         const updatedOrder = action.payload.data;
-        state.orders = state.orders.map((order) =>
-          order._id === updatedOrder._id 
+        state.orders = state.orders.map(
+          (order) => order._id === updatedOrder._id
         );
       })
 
@@ -192,6 +203,17 @@ const orderSlice = createSlice({
         state.orders = state.orders.map((order) =>
           order._id === updatedOrder._id ? updatedOrder : order
         );
+      })
+      .addCase(getOrderAnyltics.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getOrderAnyltics.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderAnyltics = action.payload;
+      })
+      .addCase(getOrderAnyltics.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
       });
   },
 });

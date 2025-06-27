@@ -1,9 +1,10 @@
 @import "tailwindcss";
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
+ 
   color-scheme: light dark;
 
   font-synthesis: none;
@@ -12,14 +13,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body{
+body {
   background: white !important;
+   width: 100% !important;
+  overflow-x:hidden !important;
 }
+
 /* Custom style to make Ant Design Rate stars black */
 .ant-rate-star-full .anticon,
 .ant-rate-star-half .anticon {
   color: black !important;
 }
+
 .ant-checkbox-checked .ant-checkbox-inner {
   background-color: #a44c6c;
   border-color: #c97a9f;
@@ -38,6 +43,7 @@ body{
   background-color: #c97a9f !important;
   color: white !important;
 }
+
 .custom-step-line .ant-steps-item-process .ant-steps-item-icon {
   border-color: var(--line-color) !important;
   background-color: var(--line-color) !important;

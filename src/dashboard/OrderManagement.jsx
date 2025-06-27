@@ -22,17 +22,18 @@ import { token } from "../auth";
 const { Search } = Input;
 const { Text, Title } = Typography;
 const { Option } = Select;
-const { TextArea } = AntInput;
+const { TextArea } = Input;
 
 const OrderManagement = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const dispatch = useDispatch();
   const Orders = useSelector((state) => state.order);
   const Data = Array.isArray(Orders?.orders?.data)
-    ? [...Orders.orders?.data]
-        .reverse()
+    ? Orders.orders.data
         .filter((pay) => pay.razor_payment === "done")
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort by most recent
     : [];
+
   // console.log("order", Orders)
   const [searchData, setSearchData] = useState("");
   const filterdata = Data.filter((order) => {
@@ -42,9 +43,11 @@ const OrderManagement = () => {
       order.razorpay_payment_id.toLowerCase().includes(search) ||
       order.customer_name.toLowerCase().includes(search) ||
       order.customer_email.toLowerCase().includes(search) ||
-      order.customer_phone.includes(search)
+      order.customer_phone.includes(search)||
+      order.order_status.includes(search)
     );
   });
+  console.log("filterdata", filterdata);
   const handleOtpChange = (value, index) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -147,38 +150,40 @@ const OrderManagement = () => {
     },
   ];
   const [form] = Form.useForm();
- const handleFormFinish = (values) => {
-  const otp = `${values.otp1 || ""}${values.otp2 || ""}${values.otp3 || ""}${values.otp4 || ""}`;
-  const {
-    deliveryman_name,
-    deliveryman_phone,
-    order_status,
-    admin_issue_returnReply,
-  } = values;
-
-  dispatch(
-    adminUpdateOrder({
-      id: selectedOrder.id,
+  const handleFormFinish = (values) => {
+    const otp = `${values.otp1 || ""}${values.otp2 || ""}${values.otp3 || ""}${
+      values.otp4 || ""
+    }`;
+    const {
       deliveryman_name,
       deliveryman_phone,
-      otp,
       order_status,
       admin_issue_returnReply,
-    })
-  );
+    } = values;
 
-  console.log("Form Submitted:", values);
+    dispatch(
+      adminUpdateOrder({
+        id: selectedOrder.id,
+        deliveryman_name,
+        deliveryman_phone,
+        otp,
+        order_status,
+        admin_issue_returnReply,
+      })
+    );
 
-  // ✅ Clear OTP fields after submission
-  form.setFieldsValue({
-    otp1: "",
-    otp2: "",
-    otp3: "",
-    otp4: "",
-  });
+    console.log("Form Submitted:", values);
 
-  setIsModalVisible(false);
-};
+    // ✅ Clear OTP fields after submission
+    form.setFieldsValue({
+      otp1: "",
+      otp2: "",
+      otp3: "",
+      otp4: "",
+    });
+
+    setIsModalVisible(false);
+  };
 
   return (
     <div style={{ padding: 24, position: "relative", paddingBottom: 100 }}>
@@ -195,7 +200,7 @@ const OrderManagement = () => {
       <Table
         columns={columns}
         dataSource={filterdata}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 50 }}
         bordered
         rowKey="id"
       />
@@ -224,14 +229,14 @@ const OrderManagement = () => {
           >
             <div style={{ display: "flex", gap: 24 }}>
               <Form.Item label="Order ID" name="id" style={{ flex: 1 }}>
-                <AntInput disabled style={{ color: "black" }} />
+                <AntInput readOnly style={{ color: "black" }} />
               </Form.Item>
               <Form.Item
                 label="Payment ID"
                 name="razorpay_payment_id"
                 style={{ flex: 1 }}
               >
-                <AntInput disabled style={{ color: "black" }} />
+                <AntInput readOnly style={{ color: "black" }} />
               </Form.Item>
             </div>
 
@@ -241,7 +246,7 @@ const OrderManagement = () => {
                 name={"customer_name"}
                 style={{ flex: 1 }}
               >
-                <AntInput disabled style={{ color: "black" }} />
+                <AntInput readOnly style={{ color: "black" }} />
               </Form.Item>
               <Form.Item
                 label="Order Status"
@@ -403,15 +408,15 @@ const OrderManagement = () => {
             <Form.Item label="Title" name="issue_type">
               <AntInput
                 placeholder="Return title..."
-                disabled
+                readOnly
                 style={{ color: "black" }}
               />
             </Form.Item>
             <Form.Item label="Description" name="issue_description">
               <TextArea
-                rows={4}
+                // rows={4}
                 placeholder="Describe the return reason..."
-                disabled
+                readOnly
                 style={{ color: "black" }}
               />
             </Form.Item>

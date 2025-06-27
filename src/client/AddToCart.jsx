@@ -174,7 +174,27 @@ export default function AddToCartAntd() {
                         </span>
                       </div>
                       <div className="mt-2 text-black font-semibold">
-                        ₹{item.price.toFixed(2)}
+                        ₹
+                        <Text
+                          delete
+                          style={{
+                            color: "#B03A66",
+                            fontSize: 15,
+                            marginRight: 8,
+                          }}
+                        >
+                          ₹{item.price}
+                        </Text>
+                        <Text
+                          strong
+                          style={{
+                            color: "#B03A66",
+                            fontSize: 20,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ₹{item.discountedPrice}
+                        </Text>
                       </div>
                       <div className="mt-2 flex items-center gap-2">
                         <Button

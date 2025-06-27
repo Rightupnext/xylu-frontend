@@ -36,7 +36,7 @@ const HomeDashboard = () => {
   const [dateRange, setDateRange] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
   const user = token.getUser();
-  console.log("user", user);
+  // console.log("user", user);
   const {
     orderAnyltics: {
       pending = {},

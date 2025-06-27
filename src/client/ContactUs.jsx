@@ -39,7 +39,7 @@ const contactInfo = [
 
 const ContactPage = () => {
     const onFinish = (values) => {
-    console.log("Form submitted: ", values);
+    // console.log("Form submitted: ", values);
   };
   return (
     <>

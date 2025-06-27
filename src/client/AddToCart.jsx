@@ -61,7 +61,7 @@ export default function AddToCartAntd() {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
-    script.onload = () => console.log("Razorpay script loaded");
+    // script.onload = () => console.log("Razorpay script loaded");
     document.body.appendChild(script);
   }, []);
 

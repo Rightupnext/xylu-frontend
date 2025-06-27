@@ -47,7 +47,7 @@ const OrderManagement = () => {
       order.order_status.includes(search)
     );
   });
-  console.log("filterdata", filterdata);
+  // console.log("filterdata", filterdata);
   const handleOtpChange = (value, index) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -172,7 +172,7 @@ const OrderManagement = () => {
       })
     );
 
-    console.log("Form Submitted:", values);
+    // console.log("Form Submitted:", values);
 
     // ✅ Clear OTP fields after submission
     form.setFieldsValue({

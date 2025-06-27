@@ -9,8 +9,14 @@ import {
   Popconfirm,
   Modal,
   Input,
+  Checkbox,
+  Radio,
 } from "antd";
-import { UploadOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
   uploadHeroImage,
@@ -29,6 +35,7 @@ const HeroImageUpload = () => {
   // Controlled form states
   const [url, setUrl] = useState("");
   const [file, setFile] = useState(null);
+  const [size, setSize] = useState("small");
   const [preview, setPreview] = useState(null);
 
   // Edit mode states
@@ -70,6 +77,7 @@ const HeroImageUpload = () => {
     setIsEdit(false);
     setEditId(null);
     setUrl("");
+    setSize("small");
     setFile(null);
     setPreview(null);
     setModalOpen(true);
@@ -80,6 +88,7 @@ const HeroImageUpload = () => {
     setIsEdit(true);
     setEditId(hero.id);
     setUrl(hero.url || "");
+    setSize(hero.size || "small");
     setFile(null); // no new file yet
     setPreview(`http://localhost:5005/uploads/hero/${hero.filename}`);
     setModalOpen(true);
@@ -98,6 +107,7 @@ const HeroImageUpload = () => {
       formData.append("heroImage", file);
     }
     formData.append("url", url);
+    formData.append("size", size);
 
     if (isEdit) {
       // update action with id
@@ -146,6 +156,16 @@ const HeroImageUpload = () => {
         okText={isEdit ? "Update" : "Upload"}
         confirmLoading={loading}
       >
+        <Radio.Group
+          value={size}
+          onChange={(e) => setSize(e.target.value)}
+          style={{ marginBottom: 16 }}
+        >
+          <Radio value="small">Small (w640×h500)</Radio>
+          <Radio value="medium">Medium (w800×h700)</Radio>
+          <Radio value="large">Large (w1200×h800)</Radio>
+        </Radio.Group>
+
         <Input
           placeholder="Enter URL"
           value={url}
@@ -166,7 +186,12 @@ const HeroImageUpload = () => {
           <img
             src={preview}
             alt="Preview"
-            style={{ marginTop: 16, width: "100%", maxHeight: 200, objectFit: "cover" }}
+            style={{
+              marginTop: 16,
+              width: "100%",
+              maxHeight: 200,
+              objectFit: "cover",
+            }}
           />
         )}
       </Modal>
@@ -177,11 +202,38 @@ const HeroImageUpload = () => {
             <Card
               hoverable
               cover={
-                <img
-                  alt="Hero"
-                  src={`http://localhost:5005/uploads/hero/${img.filename}`}
-                  style={{ height: 200, objectFit: "cover" }}
-                />
+                <div style={{ position: "relative" }}>
+                  {/* Size Badge with color logic */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 8,
+                      left: 8,
+                      backgroundColor:
+                        img.size === "small"
+                          ? "#7d5ad8" // red-600
+                          : img.size === "medium"
+                          ? "#000000" // black
+                          : img.size === "large"
+                          ? "#fe4621"
+                          : "#fe4621",
+                      color: "#fff",
+                      padding: "2px 8px",
+                      borderRadius: "8px",
+                      fontSize: "18px",
+                      zIndex: 2,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {img.size || "N/A"}
+                  </div>
+
+                  <img
+                    alt="Hero"
+                    src={`http://localhost:5005/uploads/hero/${img.filename}`}
+                    style={{ height: 200, objectFit: "cover", width: "100%" }}
+                  />
+                </div>
               }
               actions={[
                 <EditOutlined

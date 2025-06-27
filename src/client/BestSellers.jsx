@@ -39,6 +39,9 @@ export default function BestSellers() {
           .map((item, idx) => (
             <div key={idx} className="px-2">
               <Card
+              onClick={() =>
+                        navigate(`/collections/newarrivals/${item.id}`)
+                      }
                 hoverable
                 className="relative rounded-lg overflow-hidden shadow-md"
                 cover={

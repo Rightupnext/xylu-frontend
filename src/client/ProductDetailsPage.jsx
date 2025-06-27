@@ -36,7 +36,8 @@ const ProductDetail = () => {
       : 0;
 
   const discountAmount = (originalPrice * discountPercentage) / 100;
-  const discountedPrice = originalPrice - discountAmount;
+const discountedPrice = Math.round(originalPrice - discountAmount);
+
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
 

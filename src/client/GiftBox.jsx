@@ -60,10 +60,10 @@ const GiftBox = ({ timeLeft }) => {
 
   return (
     <section className="absolute mx-auto w-full mt-[190px] backdrop:blur-2xl my-auto">
-      <div className="relative w-[400px] h-[450px] mx-auto cursor-pointer">
+      <div className="relative w-[400px] sm:w-[377px] h-[450px] sm:mx-auto cursor-pointer mx-[50px]">
         {/* Lid Animation */}
         <motion.div
-          className="absolute top-[19px] left-[1px] z-50 cursor-pointer w-[700px]"
+          className="absolute sm:top-[19px] sm:left-[1px] left-[4px] z-50 cursor-pointer w-[220px] sm:w-[900px] top-[30px] rotate-[2deg] sm:rotate-0 "
           onClick={handleClick}
           initial={{ opacity: 0, y: -100 }}
           animate={
@@ -106,7 +106,7 @@ const GiftBox = ({ timeLeft }) => {
         {!isOpen && (
           <motion.img
             src={giftbottom1}
-            className="absolute bottom-0 left-[10px] z-10"
+            className="absolute sm:bottom-0 left-[10px] z-10 w-[200px] sm:w-[700px] bottom-[200px] "
             alt="Gift Bottom 1"
             animate={
               isShaking
@@ -124,7 +124,7 @@ const GiftBox = ({ timeLeft }) => {
           <motion.img
             onClick={handleClick}
             src={giftbottom2}
-            className="absolute bottom-0 left-[10px] z-10"
+            className="absolute bottom-0 left-[10px] z-10 w-[200px] sm:w-[700px]"
             alt="Gift Bottom 2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -139,7 +139,7 @@ const GiftBox = ({ timeLeft }) => {
               onClick={handleClick}
               src={timer}
               key="timer"
-              className="absolute bottom-[230px] z-[60]"
+              className="absolute bottom-[230px] z-[60] sm:w-full w-[250px]"
               alt="Timer"
               initial={{ y: 100, x: 0, scale: 0.4, opacity: 0 }}
               animate={{
@@ -171,7 +171,7 @@ const GiftBox = ({ timeLeft }) => {
               key={tapKey}
               src={tab}
               alt="Tap to open"
-              className="absolute  top-[90px] left-[170px] w-[60px] z-[900]"
+              className="absolute  sm:top-[90px] top-[60px] sm:left-[170px] left-[80px] w-[60px] z-[900]"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{
                 scale: [1, 1.5, 1],
@@ -187,7 +187,7 @@ const GiftBox = ({ timeLeft }) => {
             />
           )}
           {showCountdownDigits && (
-            <div className="flex gap-[20px] z-[900] text-6xl absolute ml-[50px] mt-[-170px] font-extrabold">
+            <div className="flex gap-[20px] z-[900] sm:text-6xl text-3xl absolute sm:ml-[30px] ml-[30px] mt-[-20px] sm:mt-[-150px] font-extrabold">
               {[
                 timeLeft.days,
                 timeLeft.hours,

@@ -123,7 +123,7 @@ const OrderHistory = () => {
       <Title level={3}>Order History</Title>
 
       {/* FILTERS */}
-      <Card style={{ marginBottom: 24 }}>
+      {/* <Card style={{ marginBottom: 24 }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} md={6}>
             <Input
@@ -176,7 +176,7 @@ const OrderHistory = () => {
             </Select>
           </Col>
         </Row>
-      </Card>
+      </Card> */}
 
       {/* ORDER CARDS */}
       <Row gutter={[16, 16]}>
@@ -380,7 +380,27 @@ const OrderHistory = () => {
                         {/* Quantity */}
                         <p style={{ marginTop: 8 }}>Qty : {product.quantity}</p>
                         <p style={{ marginTop: 8 }}>
-                          Price : ₹ {product.price}
+                          <Text
+                            delete
+                            style={{
+                              color: "#B03A66",
+                              fontSize: 18,
+                              marginRight: 8,
+                            }}
+                          >
+                            ₹{product?.price}
+                          </Text>
+
+                          <Text
+                            strong
+                            style={{
+                              color: "#B03A66",
+                              fontSize: 21,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            ₹{product?.discountedPrice}
+                          </Text>
                         </p>
                       </div>
                     </Col>
@@ -443,6 +463,16 @@ const OrderHistory = () => {
                 </Form.Item>
                 <Form.Item name="issue_description" label="Issue Description">
                   <Input.TextArea
+                    rows={4}
+                    placeholder="Describe the issue..."
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="admin_issue_returnReply"
+                  label={<span style={{ fontWeight: "bold" }}>XYLU REPLY</span>}
+                >
+                  <Input.TextArea
+                    readOnly
                     rows={4}
                     placeholder="Describe the issue..."
                   />

@@ -13,10 +13,10 @@ import { motion, AnimatePresence, useCycle } from "framer-motion";
 import { Link } from "react-router-dom";
 import { TiThMenu } from "react-icons/ti";
 import { GiAmpleDress } from "react-icons/gi";
-import { Avatar, Badge, Popover } from "antd";
+import { Avatar, Badge, Input, Popover } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../store/slice/categorySlice";
-
+const { Search } = Input;
 const collectionItems = [
   "Occasion Wear",
   "Fusion Wear",
@@ -44,7 +44,7 @@ export default function Navbar() {
     dispatch(fetchCategories());
   }, [dispatch]);
   return (
-    <nav className="w-full shadow-md bg-white fixed top-0 z-50">
+    <nav className="w-full shadow-md bg-white fixed top-0 z-50 ">
       {/* Top bar */}
       <div className="bg-[#c9789f]  text-sm px-4 py-2 flex flex-col md:flex-row items-center justify-between">
         {/* Social Icons */}
@@ -55,9 +55,7 @@ export default function Navbar() {
         </div>
 
         {/* Offer Text */}
-        <h1 className="text-center font-medium text-white">
-          Buy Any 3 Oversized T-Shirts At @1099/-
-        </h1>
+       
       </div>
 
       {/* Main nav */}
@@ -116,7 +114,17 @@ export default function Navbar() {
 
         {/* Right Icons */}
         <div className="flex space-x-4 items-center text-lg text-black">
-          <SearchOutlined className="cursor-pointer" />
+          {/* <Search
+            placeholder="Search products"
+            onSearch={(value) => {
+              // Navigate to ShopPage and pass search query
+              window.location.href = `/collections/all?search=${encodeURIComponent(
+                value
+              )}`;
+            }}
+            style={{ width: 200 }}
+            allowClear
+          /> */}
 
           <Link to="/cart">
             <Badge count={distinctCount} showZero>
@@ -205,13 +213,15 @@ export default function Navbar() {
               <div>
                 <span className="block mb-2">COLLECTION</span>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  {collectionItems.map((item, index) => (
+                  {categories?.data?.map((item, index) => (
                     <Link
                       key={index}
-                      to={`/${item.toLowerCase().replace(/\s/g, "-")}`}
+                      to={`/collections/${item.category_name
+                        .toLowerCase()
+                        .replace(/\s/g, "-")}`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {item}
+                      {item.category_name}
                     </Link>
                   ))}
                 </div>

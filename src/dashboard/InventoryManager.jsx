@@ -13,6 +13,7 @@ import {
   Tag,
   Popconfirm,
   Checkbox,
+  DatePicker,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,9 +22,10 @@ import {
   updateProduct,
   deleteProduct,
 } from "../store/slice/productSlice";
+import dayjs from "dayjs";
 import { fetchCategories } from "../store/slice/categorySlice";
 const { Option } = Select;
-
+const { RangePicker } = DatePicker;
 const colorOptions = [
   "Black",
   "White",
@@ -96,13 +98,22 @@ const InventoryManager = () => {
 
   const openModal = (record = null) => {
     if (record) {
-      form.setFieldsValue(record);
+      const offerRange = record.offerExpiry
+        ? record.offerExpiry.split(",").map((d) => dayjs(d.trim()))
+        : [];
+
+      form.setFieldsValue({
+        ...record,
+        offerExpiry:
+          Array.isArray(offerRange) && offerRange.every((d) => d.isValid())
+            ? offerRange
+            : undefined,
+      });
       setEditId(record.id);
 
       if (record.image) {
         const filename = record.image.split("/").pop();
         setExistingImageName(filename);
-
         const imageUrl = `http://localhost:5005/uploads/products/${filename}`;
         setImagePreview(imageUrl);
         setSelectedFile(null);
@@ -137,9 +148,16 @@ const InventoryManager = () => {
     formData.append("Bulk_discount", values.Bulk_discount ? 1 : 0);
     formData.append("trend", values.trend || "regular");
 
+    // ✅ Format offerExpiry
+    const offerExpiry =
+      Array.isArray(values.offerExpiry) && values.offerExpiry.length === 2
+        ? values.offerExpiry.map((d) => dayjs(d).toISOString()).join(",")
+        : "";
+
+    formData.append("offerExpiry", offerExpiry);
+
     if (selectedFile) {
       formData.append("image", selectedFile);
-
       if (existingImageName && editId) {
         formData.append("existingImage", existingImageName);
       }
@@ -364,30 +382,34 @@ const InventoryManager = () => {
                 <InputNumber min={0} max={100} style={{ width: "100%" }} />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="trend" label="Trend">
-                <Select>
-                  <Select.Option value="new">New</Select.Option>
-                  <Select.Option value="bestseller">Bestseller</Select.Option>
-                  <Select.Option value="regular">Regular</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="Bulk_discount"
-                valuePropName="checked"
-                label="Bulk Discount"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginLeft: 145,
-                }}
-              >
-                <Checkbox style={{ transform: "scale(2.5)" }} />
-              </Form.Item>
-            </Col>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item name="trend" label="Trend" style={{ width: 240 }}>
+                  <Select>
+                    <Select.Option value="new">New</Select.Option>
+                    <Select.Option value="bestseller">Bestseller</Select.Option>
+                    <Select.Option value="regular">Regular</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={10}>
+                <Form.Item name="offerExpiry" label="Offer Expiry Date Range">
+                  <RangePicker showTime style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+
+              <Col span={6}>
+                <Form.Item
+                  name="Bulk_discount"
+                  valuePropName="checked"
+                  label="Bulk Discount"
+                  style={{ marginTop: 1, width: 240, marginLeft: 44 }} // align vertically
+                >
+                  <Checkbox style={{ transform: "scale(2.5)" }} />
+                </Form.Item>
+              </Col>
+            </Row>
           </Row>
 
           <Form.List name="variants">

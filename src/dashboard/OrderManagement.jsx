@@ -184,7 +184,7 @@ const OrderManagement = () => {
 
     setIsModalVisible(false);
   };
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   return (
     <div style={{ padding: 24, position: "relative", paddingBottom: 100 }}>
       <Title level={3}>Order Management</Title>
@@ -325,7 +325,7 @@ const OrderManagement = () => {
                   }}
                 >
                   <Image
-                    src={`http://localhost:5005/uploads/${product.image}`}
+                    src={`${backendUrl}/uploads/${product.image}`}
                     width={80}
                     height={80}
                   />

@@ -52,3 +52,6 @@ body {
 .custom-step-line .ant-steps-item-process .ant-steps-item-tail::after {
   background-color: var(--line-color) !important;
 }
+.about-section {
+  background: linear-gradient(to bottom right, #fffdfd, #faf5f5);
+}

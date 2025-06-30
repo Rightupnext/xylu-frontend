@@ -74,7 +74,7 @@ export default function Hero() {
 
   // Filter slides based on screen size
   const filteredSlides = heroImages.filter((img) => img.size === screenSize);
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   return (
     <>
       <Carousel autoplay dots>
@@ -82,7 +82,7 @@ export default function Hero() {
           <div key={index} className="mt-[21px]">
             <div className="relative w-full h-[82vh] overflow-hidden mt-[130px] sm:mt-[124px]">
               <img
-                src={`http://localhost:5005/uploads/hero/${slide.filename}`}
+                src={`${backendUrl}/uploads/hero/${slide.filename}`}
                 alt={`Slide ${index + 1}`}
                 className="w-full h-full"
               />

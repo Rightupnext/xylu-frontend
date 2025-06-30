@@ -117,7 +117,7 @@ const ProductDetail = () => {
       </div>
     );
   }
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   return (
     <>
       <div className="max-w-screen-xl mx-auto p-6 mt-[170px]">
@@ -129,7 +129,7 @@ const ProductDetail = () => {
               transition={{ duration: 0.5 }}
             >
               <img
-                src={`http://localhost:5005/uploads/${selectedProduct?.image}`}
+                src={`${backendUrl}/uploads/${selectedProduct?.image}`}
                 alt={selectedProduct?.product_name}
                 className="w-full rounded shadow"
               />

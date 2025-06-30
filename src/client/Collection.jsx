@@ -47,16 +47,16 @@ const filters = {
   ],
   size: ["XS", "S", "M", "L", "XL", "XXL"],
 };
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 const ProductCard = ({ product }) => (
   <motion.div
     className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition-all"
     whileHover={{ scale: 1.02 }}
   >
-    <Link to={`${product.id}`} className="cursor-pointer">
+    <Link to={product.Bulk_discount === 1 ? `/offers/${product.category}/${product.id}` : `${product.id}`} className="cursor-pointer">
       <div className="relative">
         <img
-          src={`http://localhost:5005/uploads/${product.image}`}
+          src={`${backendUrl}/uploads/${product.image}`}
           alt={product.title}
           className="w-full h-73 object-contain"
         />

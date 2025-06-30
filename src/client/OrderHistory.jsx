@@ -84,7 +84,7 @@ const OrderHistory = () => {
         issue_description,
       })
     );
-    // console.log("Return reason submitted:", values);
+    console.log("Return reason submitted:", values);
     setShowReturnForm(false);
   };
 
@@ -117,7 +117,7 @@ const OrderHistory = () => {
       </Space>
     );
   };
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   return (
     <div style={{ padding: 24, marginTop: 123 }} className="bg-gray-100">
       <Title level={3}>Order History</Title>
@@ -292,7 +292,7 @@ const OrderHistory = () => {
                     {/* LEFT COLUMN - IMAGE */}
                     <Col xs={24} sm={8}>
                       <Image
-                        src={`http://localhost:5005/uploads/${product?.image}`}
+                        src={`${backendUrl}/uploads/${product?.image}`}
                         alt={product?.product_name}
                         width="100%"
                         style={{

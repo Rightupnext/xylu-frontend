@@ -16,6 +16,7 @@ import { GiAmpleDress } from "react-icons/gi";
 import { Avatar, Badge, Input, Popover } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../store/slice/categorySlice";
+import Scroll from "./Scroll";
 const { Search } = Input;
 const collectionItems = [
   "Occasion Wear",

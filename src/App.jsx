@@ -12,7 +12,7 @@ import Login from "./client/Login";
 import AddToCart from "./client/AddToCart";
 import Layout from "./dashboard/Layout";
 import HomeDashboard from "./dashboard/HomeDashboard";
-
+import Policies from './client/Policies'
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import ScrollToTop from "./ScrollToTop";
@@ -22,6 +22,7 @@ import PageNotFound from "./PageNotFound";
 import HeroImageUpload from "./dashboard/HeroImageUpload";
 import OrderHistory from "./client/OrderHistory";
 import OrderManagement from "./dashboard/OrderManagement";
+import AboutSection from "./client/About";
 function App() {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith("/admin");
@@ -36,22 +37,24 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/collections/:collections" element={<Collection />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/about" element={<AboutSection />} />
+        <Route path="/policies" element={<Policies />} />
 
         {/* 🔒 PRIVATE ROUTES (authenticated users only) */}
         <Route
           path="/collections/:collections/:id"
           element={
-            // <PrivateRoute>
-            <ProductDetail />
-            // </PrivateRoute>
+            <PrivateRoute>
+              <ProductDetail />
+            </PrivateRoute>
           }
         />
         <Route
           path="/offers/:collections/:id"
           element={
-            // <PrivateRoute>
-            <ProductOfferDetailsPage />
-            // </PrivateRoute>
+            <PrivateRoute>
+              <ProductOfferDetailsPage />
+            </PrivateRoute>
           }
         />
         <Route

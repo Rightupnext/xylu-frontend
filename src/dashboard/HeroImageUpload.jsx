@@ -82,7 +82,7 @@ const HeroImageUpload = () => {
     setPreview(null);
     setModalOpen(true);
   };
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   // Open modal for edit mode
   const openEditModal = (hero) => {
     setIsEdit(true);
@@ -90,7 +90,7 @@ const HeroImageUpload = () => {
     setUrl(hero.url || "");
     setSize(hero.size || "small");
     setFile(null); // no new file yet
-    setPreview(`http://localhost:5005/uploads/hero/${hero.filename}`);
+    setPreview(`${backendUrl}/uploads/hero/${hero.filename}`);
     setModalOpen(true);
   };
 
@@ -230,7 +230,7 @@ const HeroImageUpload = () => {
 
                   <img
                     alt="Hero"
-                    src={`http://localhost:5005/uploads/hero/${img.filename}`}
+                    src={`${backendUrl}/uploads/hero/${img.filename}`}
                     style={{ height: 200, objectFit: "cover", width: "100%" }}
                   />
                 </div>

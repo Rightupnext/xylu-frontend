@@ -95,7 +95,7 @@ const InventoryManager = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL
   const openModal = (record = null) => {
     if (record) {
       const offerRange = record.offerExpiry
@@ -114,7 +114,7 @@ const InventoryManager = () => {
       if (record.image) {
         const filename = record.image.split("/").pop();
         setExistingImageName(filename);
-        const imageUrl = `http://localhost:5005/uploads/products/${filename}`;
+        const imageUrl = `${backendUrl}/uploads/products/${filename}`;
         setImagePreview(imageUrl);
         setSelectedFile(null);
       } else {
@@ -179,6 +179,7 @@ const InventoryManager = () => {
   };
 
   const columns = [
+    { title: "id", dataIndex: "id" },
     { title: "Product Name", dataIndex: "product_name" },
     { title: "Category", dataIndex: "category" },
     { title: "Product Code", dataIndex: "product_code" },

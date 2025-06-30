@@ -11,6 +11,7 @@ export default function BestSellers() {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
   return (
     <div className="px-4 md:px-10 lg:px-20 py-10 bg-white">
       {/* Heading */}
@@ -47,7 +48,7 @@ export default function BestSellers() {
                 cover={
                   <div className="relative">
                     <img
-                      src={`http://localhost:5005/uploads/${item.image}`}
+                      src={`${backendUrl}/uploads/${item.image}`}
                       alt={item.product_name}
                       className="h-[400px] w-full object-contain"
                     />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Row, Col, Input, Typography } from "antd";
 import {
   FacebookFilled,
@@ -10,9 +10,22 @@ import { FaFacebook } from "react-icons/fa";
 import { FaInstagramSquare } from "react-icons/fa";
 import { BsYoutube } from "react-icons/bs";
 import { FaArrowRight } from "react-icons/fa6";
+import img1 from "../assets/footer/1.png";
+import img2 from "../assets/footer/2.png";
+import img3 from "../assets/footer/3.png";
+import img4 from "../assets/footer/4.png";
+import img5 from "../assets/footer/5.png";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../store/slice/categorySlice";
 const { Title, Text } = Typography;
 
 const Footer = () => {
+  const dispatch = useDispatch();
+  const { categories, loading } = useSelector((state) => state.category);
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
   return (
     <div className="bg-[#fdcbde] p-6 md:p-12 rounded-t-[50px] shadow-2xl">
       {/* Newsletter */}
@@ -25,8 +38,9 @@ const Footer = () => {
         </Text>
         <div className="max-w-lg mx-auto mt-4 relative">
           <input
+            style={{ color: "#000000" }}
             placeholder="Email"
-            className="rounded-full w-full pr-12 py-[15px] bg-gray-50 text-black px-4 ring-[#a5496c] ring-2 placeholder-black"
+            className="rounded-full w-full pr-12 py-[15px]  bg-gray-50 text-black px-4 ring-[#a5496c] ring-2 placeholder-black"
           />
 
           <FaArrowRight className="absolute right-5 top-[18px] text-lg text-[#b03a66]" />
@@ -45,6 +59,18 @@ const Footer = () => {
             <FaFacebook className="text-blue-500 w-[40px] h-[40px] cursor-pointer" />
             <BsYoutube className="text-red-500 w-[40px] h-[40px] cursor-pointer" />
           </div>
+          <div className="py-6 ">
+            <h4 className="text-lg font-semibold text-gray-700 mb-2">
+              We Accept
+            </h4>
+            <div className="flex justify-cente gap-4 flex-wrap">
+              <img src={img1} alt="UPI" className="h-8 object-contain" />
+              <img src={img2} alt="Visa" className="h-8 object-contain" />
+              <img src={img3} alt="MasterCard" className="h-8 object-contain" />
+              <img src={img5} alt="NetBanking" className="h-8 object-contain" />
+              <img src={img4} alt="Pay Later" className="h-8 object-contain" />
+            </div>
+          </div>
         </Col>
 
         {/* COMPANY */}
@@ -53,10 +79,26 @@ const Footer = () => {
             COMPANY
           </Title>
           <ul className="space-y-1 text-black ">
-            <li>About</li>
-            <li>Collection</li>
-            <li>FAQ</li>
-            <li>Contact</li>
+            <li>
+              <Link to="/about" style={{ color: "black" }}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" style={{ color: "black" }}>
+                Collection
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" style={{ color: "black" }}>
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" style={{ color: "black" }}>
+                Contact
+              </Link>
+            </li>
           </ul>
         </Col>
 
@@ -65,14 +107,20 @@ const Footer = () => {
           <Title level={5} className="text-[#b03a66]">
             SHOP
           </Title>
-          <ul className="space-y-1 text-black">
-            <li>Ethnic Wear</li>
-            <li>Occasion Wear</li>
-            <li>Western Wear</li>
-            <li>Fusion Wear</li>
-            <li>Maternity Wear</li>
-            <li>By Length</li>
-            <li>By Length</li>
+          <ul className="space-y-1 text-black ">
+            {categories?.data?.slice(0, 5).map((item, index) => (
+              <li key={index}>
+                <Link
+                  to={`/collections/${item.category_name
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  className="hover:underline"
+                  style={{ color: "black" }}
+                >
+                  {item.category_name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </Col>
 
@@ -82,10 +130,42 @@ const Footer = () => {
             POLICIES
           </Title>
           <ul className="space-y-1 text-black">
-            <li>Returns & Refunds</li>
-            <li>Terms & Conditions</li>
-            <li>Privacy Policy</li>
-            <li>Shipping Policy</li>
+            <li>
+              <Link
+                to="/policies"
+                className="hover:underline"
+                style={{ color: "black" }}
+              >
+                Returns & Refunds
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/policies"
+                className="hover:underline"
+                style={{ color: "black" }}
+              >
+                Terms & Conditions
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/policies"
+                className="hover:underline"
+                style={{ color: "black" }}
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/policies"
+                className="hover:underline"
+                style={{ color: "black" }}
+              >
+                Shipping Policy
+              </Link>
+            </li>
           </ul>
         </Col>
 

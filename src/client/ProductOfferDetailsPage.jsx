@@ -188,15 +188,10 @@ const ProductOfferDetailsPage = () => {
     timeLeft.hours === 0 &&
     timeLeft.minutes === 0 &&
     timeLeft.seconds === 0;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   return (
     <>
       <div className="max-w-screen-xl mx-auto p-6 mt-[170px] relative">
-        {isCountdownOver && (
-          <img
-            src={soldout}
-            className="bg-gary-500 absolute z-[40] w-3/4 opacity-50 mt-[230px] mx-auto"
-          />
-        )}
         <Row gutter={[32, 32]} align="top">
           <Col xs={24} md={12}>
             <motion.div
@@ -205,7 +200,7 @@ const ProductOfferDetailsPage = () => {
               transition={{ duration: 0.5 }}
             >
               <img
-                src={`http://localhost:5005/uploads/${selectedProduct?.image}`}
+                src={`${backendUrl}/uploads/${selectedProduct?.image}`}
                 alt={selectedProduct?.product_name}
                 className="w-full rounded shadow"
               />
@@ -484,7 +479,7 @@ const ProductOfferDetailsPage = () => {
       <Review reviews={reviews} id={id} />
       <NewArrivals />
 
-      {!isCountdownOver && isModalOpen && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="relative w-full max-w-3xl h-[80vh] bg-transparent flex items-center justify-center">
             {/* Close Button */}
@@ -497,7 +492,14 @@ const ProductOfferDetailsPage = () => {
 
             {/* Centered Modal Content */}
             <div className="w-full h-full flex items-center justify-center">
-              <GiftBox timeLeft={timeLeft} />
+              {isCountdownOver ? (
+                <img
+                  src={soldout}
+                  className="bg-gary-500 absolute z-[40] w-3/4 opacity-50 mt-[230px] mx-auto"
+                />
+              ) : (
+                <GiftBox timeLeft={timeLeft} />
+              )}
             </div>
           </div>
         </div>

@@ -3,8 +3,9 @@ import { Form, Input, Button } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { loginUser, registerUser } from "../store/slice/authSlice";
-
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("signup");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -14,17 +15,43 @@ const Login = () => {
     visible: { opacity: 1, y: 0 },
   };
 
-  const onFinish = (values) => {
-    if (activeTab === "signup") {
-      dispatch(registerUser(values));
-    } else {
-      dispatch(loginUser(values));
+ const onFinish = async (values) => {
+  let response;
+
+  if (activeTab === "signup") {
+    response = await dispatch(registerUser(values));
+
+    // Optional: check if registration succeeded
+    const success = response?.payload?.success || response?.meta?.requestStatus === "fulfilled";
+    
+    if (success) {
+      // Switch to sign-in tab
+      setActiveTab("signin");
+
+
+      form.resetFields();
+      return; // exit early
     }
+
+  } else {
+    // Sign-in logic
+    response = await dispatch(loginUser(values));
+
+    const userRole = response?.payload?.user?.role || response?.user?.role;
+
+    if (userRole === "admin") {
+      navigate("/admin");
+    } else {
+      window.history.back();
+    }
+
     form.resetFields();
-  };
+  }
+};
+
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full mt-[100px]">
       <div className="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center p-6">
         <div className="w-full max-w-md mb-6">
           <div className="flex gap-1 text-sm font-semibold tracking-wide mb-2">

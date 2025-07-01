@@ -7,7 +7,6 @@ import NewArrivals from "./NewArrivals";
 import StylishWomenSection from "./StylishWomenSection";
 import Scroll from "./Scroll";
 import WelcomPage from "./WelcomPage";
-import ProductsPage from "./demoProduct";
 function Home() {
   return (
     <>

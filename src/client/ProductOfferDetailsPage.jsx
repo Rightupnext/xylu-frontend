@@ -116,11 +116,24 @@ const ProductOfferDetailsPage = () => {
       .filter((v) => v.color === selectedColor)
       .flatMap((v) => v.size);
   };
+const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   const expiryParts = selectedProduct?.offerExpiry?.split(",");
-  const offerEndDate = expiryParts?.[1] ? new Date(expiryParts[1]) : null;
+  const rawOfferEndDate = expiryParts?.[1] || null;
+  const offerEndDate = rawOfferEndDate ? new Date(rawOfferEndDate) : null;
+  const isValidDate = offerEndDate instanceof Date && !isNaN(offerEndDate.getTime());
+
   const calculateTimeLeft = (endDate) => {
-    const difference = endDate - new Date();
+    if (!endDate || isNaN(endDate.getTime())) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+    const now = new Date();
+    const difference = endDate - now;
     if (difference <= 0) {
       return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     }
@@ -134,18 +147,13 @@ const ProductOfferDetailsPage = () => {
   };
 
   const formatTime = (value) => String(value).padStart(2, "0");
-  const [timeLeft, setTimeLeft] = useState(
-    offerEndDate
-      ? calculateTimeLeft(offerEndDate)
-      : { days: 0, hours: 0, minutes: 0, seconds: 0 }
-  );
 
+  // Countdown timer setup
   useEffect(() => {
-    if (!offerEndDate) return;
+    if (!isValidDate) return;
 
     const timer = setInterval(() => {
       const newTimeLeft = calculateTimeLeft(offerEndDate);
-
       setTimeLeft(newTimeLeft);
 
       if (
@@ -159,15 +167,23 @@ const ProductOfferDetailsPage = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [offerEndDate]);
+  }, [isValidDate, offerEndDate]);
 
+  // Modal display delay
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsModalOpen(true);
-    }, 500); // Delay before showing modal
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
+
+  const isCountdownOver =
+    timeLeft.days === 0 &&
+    timeLeft.hours === 0 &&
+    timeLeft.minutes === 0 &&
+    timeLeft.seconds === 0;
+
 
   if (loading || !selectedProduct) {
     return (
@@ -183,11 +199,6 @@ const ProductOfferDetailsPage = () => {
       </div>
     );
   }
-  const isCountdownOver =
-    timeLeft.days === 0 &&
-    timeLeft.hours === 0 &&
-    timeLeft.minutes === 0 &&
-    timeLeft.seconds === 0;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   return (
     <>
@@ -492,14 +503,7 @@ const ProductOfferDetailsPage = () => {
 
             {/* Centered Modal Content */}
             <div className="w-full h-full flex items-center justify-center">
-              {isCountdownOver ? (
-                <img
-                  src={soldout}
-                  className="bg-gary-500 absolute z-[40] w-3/4 opacity-50 mt-[230px] mx-auto"
-                />
-              ) : (
-                <GiftBox timeLeft={timeLeft} />
-              )}
+              <GiftBox timeLeft={timeLeft} />
             </div>
           </div>
         </div>

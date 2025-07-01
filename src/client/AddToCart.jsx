@@ -20,6 +20,7 @@ import { token } from "../auth/index";
 const { Title, Text } = Typography;
 
 export default function AddToCartAntd() {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.items);
   const userid = token.getUser();
@@ -74,7 +75,7 @@ export default function AddToCartAntd() {
         return alert("Missing cart or customer info");
       }
 
-      const res = await axios.post("http://localhost:5005/order/create-order", {
+      const res = await axios.post(`${backendUrl}/order/create-order`, {
         customer,
         cartItems,
         subtotal,
@@ -92,7 +93,7 @@ export default function AddToCartAntd() {
         order_id: id,
         name: "My Shop",
         handler: async (response) => {
-          await axios.post("http://localhost:5005/order/confirm-order", {
+          await axios.post(`${backendUrl}/order/confirm-order`, {
             paymentDetails: response,
           });
 
@@ -139,7 +140,7 @@ export default function AddToCartAntd() {
                   <Row gutter={[16, 16]} align="middle" wrap>
                     <Col xs={24} sm={6} className="text-center">
                       <Image
-                        src={`http://localhost:5005/uploads/${item.image}`}
+                        src={`${backendUrl}/uploads/${item.image}`}
                         alt={item.product_name}
                         width="100%"
                         style={{ maxWidth: 120, height: "auto" }}
